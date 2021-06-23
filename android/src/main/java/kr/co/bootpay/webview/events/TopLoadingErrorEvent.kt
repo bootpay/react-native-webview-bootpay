@@ -1,4 +1,4 @@
-package com.reactnativecommunity.webview.events
+package kr.co.bootpay.webview.events
 
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.events.Event
@@ -7,9 +7,10 @@ import com.facebook.react.uimanager.events.RCTEventEmitter
 /**
  * Event emitted when there is an error in loading.
  */
-class TopMessageEvent(viewId: Int, private val mEventData: WritableMap) : Event<TopMessageEvent>(viewId) {
+class TopLoadingErrorEvent(viewId: Int, private val mEventData: WritableMap) :
+  Event<TopLoadingErrorEvent>(viewId) {
   companion object {
-    const val EVENT_NAME = "topMessage"
+    const val EVENT_NAME = "topLoadingError"
   }
 
   override fun getEventName(): String = EVENT_NAME
@@ -18,7 +19,7 @@ class TopMessageEvent(viewId: Int, private val mEventData: WritableMap) : Event<
 
   override fun getCoalescingKey(): Short = 0
 
-  override fun dispatch(rctEventEmitter: RCTEventEmitter) {
-    rctEventEmitter.receiveEvent(viewTag, EVENT_NAME, mEventData)
-  }
+  override fun dispatch(rctEventEmitter: RCTEventEmitter) =
+    rctEventEmitter.receiveEvent(viewTag, eventName, mEventData)
+
 }

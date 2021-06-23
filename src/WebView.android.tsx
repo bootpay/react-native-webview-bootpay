@@ -30,15 +30,15 @@ import {
   AndroidWebViewProps,
   NativeWebViewAndroid,
   State,
-  RNCWebViewUIManagerAndroid,
+  BPCWebViewUIManagerAndroid,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManagerAndroid;
+const UIManager = NotTypedUIManager as BPCWebViewUIManagerAndroid;
 
-const RNCWebView = requireNativeComponent(
-  'RNCWebView',
+const BPCWebView = requireNativeComponent(
+  'BPCWebView',
 ) as typeof NativeWebViewAndroid;
 const { resolveAssetSource } = Image;
 
@@ -68,7 +68,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
 
   static isFileUploadSupported = async () => {
     // native implementation should return "true" only for Android 5+
-    return NativeModules.RNCWebView.isFileUploadSupported();
+    return NativeModules.BPCWebView.isFileUploadSupported();
   };
 
   startUrl: string | null = null;
@@ -88,7 +88,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     BatchedBridge.registerCallableModule(this.messagingModuleName, this);
   };
 
-  getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
+  getCommands = () => UIManager.getViewManagerConfig('BPCWebView').Commands;
 
   goForward = () => {
     UIManager.dispatchViewManagerCommand(
@@ -285,7 +285,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     lockIdentifier?: number,
   ) => {
     if (lockIdentifier) {
-      NativeModules.RNCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
+      NativeModules.BPCWebView.onShouldStartLoadWithRequestCallback(shouldStart, lockIdentifier);
     } else if (shouldStart) {
       UIManager.dispatchViewManagerCommand(
         this.getWebViewHandle(),
@@ -323,7 +323,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
       );
     } else if (this.state.viewState !== 'IDLE') {
       console.error(
-        `RNCWebView invalid state encountered: ${this.state.viewState}`,
+        `BPCWebView invalid state encountered: ${this.state.viewState}`,
       );
     }
 
@@ -341,7 +341,7 @@ class WebView extends React.Component<AndroidWebViewProps, State> {
     }
 
     const NativeWebView
-      = (nativeConfig.component as typeof NativeWebViewAndroid) || RNCWebView;
+      = (nativeConfig.component as typeof NativeWebViewAndroid) || BPCWebView;
 
     this.onShouldStartLoadWithRequest = createOnShouldStartLoadWithRequest(
       this.onShouldStartLoadWithRequestCallback,

@@ -1,16 +1,16 @@
-package com.reactnativecommunity.webview.events
+package kr.co.bootpay.webview.events
 
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.events.Event
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
 /**
- * Event emitted when a http error is received from the server.
+ * Event emitted when loading has started
  */
-class TopHttpErrorEvent(viewId: Int, private val mEventData: WritableMap) :
-  Event<TopHttpErrorEvent>(viewId) {
+class TopLoadingStartEvent(viewId: Int, private val mEventData: WritableMap) :
+  Event<TopLoadingStartEvent>(viewId) {
   companion object {
-    const val EVENT_NAME = "topHttpError"
+    const val EVENT_NAME = "topLoadingStart"
   }
 
   override fun getEventName(): String = EVENT_NAME

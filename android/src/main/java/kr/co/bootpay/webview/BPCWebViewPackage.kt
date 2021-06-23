@@ -1,15 +1,15 @@
-package com.reactnativecommunity.webview
+package kr.co.bootpay.webview
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.ReactApplicationContext
 
 
-class RNCWebViewPackage: ReactPackage {
+class BPCWebViewPackage: ReactPackage {
   override fun createNativeModules(reactContext: ReactApplicationContext) = listOf(
-    RNCWebViewModule(reactContext)
+    BPCWebViewModule(reactContext)
   )
 
   override fun createViewManagers(reactContext: ReactApplicationContext) = listOf(
-    RNCWebViewManager()
+    BPCWebViewManager()
   )
 }

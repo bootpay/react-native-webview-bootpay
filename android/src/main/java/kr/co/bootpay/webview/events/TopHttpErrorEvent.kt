@@ -1,17 +1,16 @@
-package com.reactnativecommunity.webview.events
+package kr.co.bootpay.webview.events
 
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.uimanager.events.Event
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
 /**
- * Event emitted when the WebView's process has crashed or
-   was killed by the OS.
+ * Event emitted when a http error is received from the server.
  */
-class TopRenderProcessGoneEvent(viewId: Int, private val mEventData: WritableMap) :
-  Event<TopRenderProcessGoneEvent>(viewId) {
+class TopHttpErrorEvent(viewId: Int, private val mEventData: WritableMap) :
+  Event<TopHttpErrorEvent>(viewId) {
   companion object {
-    const val EVENT_NAME = "topRenderProcessGone"
+    const val EVENT_NAME = "topHttpError"
   }
 
   override fun getEventName(): String = EVENT_NAME

@@ -28,12 +28,12 @@ import {
   NativeWebViewIOS,
   ViewManager,
   State,
-  RNCWebViewUIManagerIOS,
+  BPCWebViewUIManagerIOS,
 } from './WebViewTypes';
 
 import styles from './WebView.styles';
 
-const UIManager = NotTypedUIManager as RNCWebViewUIManagerIOS;
+const UIManager = NotTypedUIManager as BPCWebViewUIManagerIOS;
 
 const { resolveAssetSource } = Image;
 const processDecelerationRate = (
@@ -48,10 +48,10 @@ const processDecelerationRate = (
   return newDecelerationRate;
 };
 
-const RNCWebViewManager = NativeModules.RNCWebViewManager as ViewManager;
+const BPCWebViewManager = NativeModules.BPCWebViewManager as ViewManager;
 
-const RNCWebView: typeof NativeWebViewIOS = requireNativeComponent(
-  'RNCWebView',
+const BPCWebView: typeof NativeWebViewIOS = requireNativeComponent(
+  'BPCWebView',
 );
 
 class WebView extends React.Component<IOSWebViewProps, State> {
@@ -75,7 +75,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   webViewRef = React.createRef<NativeWebViewIOS>();
 
   // eslint-disable-next-line react/sort-comp
-  getCommands = () => UIManager.getViewManagerConfig('RNCWebView').Commands;
+  getCommands = () => UIManager.getViewManagerConfig('BPCWebView').Commands;
 
   /**
    * Go forward one page in the web view's history.
@@ -251,7 +251,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
   ) => {
     const viewManager
       = (this.props.nativeConfig && this.props.nativeConfig.viewManager)
-      || RNCWebViewManager;
+      || BPCWebViewManager;
 
     viewManager.startLoadWithResult(!!shouldStart, lockIdentifier);
   };
@@ -311,7 +311,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
       );
     } else if (this.state.viewState !== 'IDLE') {
       console.error(
-        `RNCWebView invalid state encountered: ${this.state.viewState}`,
+        `BPCWebView invalid state encountered: ${this.state.viewState}`,
       );
     }
 
@@ -329,7 +329,7 @@ class WebView extends React.Component<IOSWebViewProps, State> {
 
     const NativeWebView
       = (nativeConfig.component as typeof NativeWebViewIOS | undefined)
-      || RNCWebView;
+      || BPCWebView;
 
     const webView = (
       <NativeWebView

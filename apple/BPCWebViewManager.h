@@ -5,11 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#import <WebKit/WebKit.h>
+#import <React/RCTViewManager.h>
 
-@interface RNCWKProcessPoolManager : NSObject
-
-+ (instancetype) sharedManager;
-- (WKProcessPool *)sharedProcessPool;
-
+@interface BPCWebViewManager : RCTViewManager
 @end

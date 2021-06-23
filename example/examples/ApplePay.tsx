@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View} from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView from 'react-native-webview-bootpay';
 
 type Props = {};
 type State = {};
@@ -14,7 +14,7 @@ export default class Alerts extends Component<Props, State> {
             <View style={{ flex: 1 }}>
                 <WebView
                     enableApplePay={true}
-                    source={{uri: "https://applepaydemo.apple.com/"}}
+                    source={{uri: "https://applepaydemo.apple.com2/"}}
                     automaticallyAdjustContentInsets={false}
                 />
             </View>

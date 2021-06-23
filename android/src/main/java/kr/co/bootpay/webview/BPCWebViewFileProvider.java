@@ -1,4 +1,4 @@
-package com.reactnativecommunity.webview;
+package kr.co.bootpay.webview;
 
 import androidx.core.content.FileProvider;
 
@@ -7,7 +7,7 @@ import androidx.core.content.FileProvider;
  * <p>
  * See https://developer.android.com/guide/topics/manifest/provider-element.html for details.
  */
-public class RNCWebViewFileProvider extends FileProvider {
+public class BPCWebViewFileProvider extends FileProvider {
 
   // This class intentionally left blank.
 
