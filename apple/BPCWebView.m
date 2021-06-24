@@ -202,19 +202,21 @@ static NSDictionary* customCertificatesForHost;
 //    [webView loadRequest:navigationAction.request];
 //  }
 //  return nil;
-    
+    NSLog(@"------ popup url: %@", navigationAction.request.URL.absoluteString);
+//
     WKWebView *popupView = [[WKWebView alloc] initWithFrame:webView.bounds configuration:configuration];
-
+//    [popupView loadRequest:navigationAction.request];
+//
     popupView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
     popupView.navigationDelegate = self;
     popupView.UIDelegate = self;
     [webView addSubview:popupView];
-      
-    if (!navigationAction.targetFrame.isMainFrame) {
-        [popupView loadRequest:navigationAction.request];
-    }
+//
+//    if (!navigationAction.targetFrame.isMainFrame) {
+//        [popupView loadRequest:navigationAction.request];
+//    }
 //    _resumeWebView = popupView;
-  
+//
     return popupView;
 }
 
@@ -967,21 +969,13 @@ static NSDictionary* customCertificatesForHost;
   decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
                   decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
-//    NSLog(@"------- url: %@", navigationAction.request.URL.absoluteURL);
-    if([self isItunesURL:navigationAction.request.URL.absoluteString]) {
-//        [self openAppURL:navigationAction];
-//        decisionHandler(WKNavigationActionPolicyCancel);
+    NSLog(@"------- url: %@", navigationAction.request.URL.absoluteURL);
+    if([self isItunesURL:navigationAction.request.URL.absoluteString]) { 
         [self startAppToApp:navigationAction.request.URL];
         decisionHandler(WKNavigationActionPolicyCancel);
     } else if(![navigationAction.request.URL.scheme isEqualToString:@"http"] && ![navigationAction.request.URL.scheme isEqualToString:@"https"]) {
         [self startAppToApp:navigationAction.request.URL];
-//        if([[UIApplication sharedApplication]  canOpenURL: navigationAction.request.URL]) {
-//            [self openAppURL:navigationAction];
-//        } else {
-//            [self goInstallApp: navigationAction];
-//        }
         decisionHandler(WKNavigationActionPolicyCancel);
-        
     } else {
         [self navigationOriginRN:webView decidePolicyForNavigationAction:navigationAction decisionHandler:decisionHandler];
     }
