@@ -198,10 +198,29 @@ static NSDictionary* customCertificatesForHost;
  */
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
-  if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
-  }
-  return nil;
+//  if (!navigationAction.targetFrame.isMainFrame) {
+//    [webView loadRequest:navigationAction.request];
+//  }
+//  return nil;
+    
+    WKWebView *popupView = [[WKWebView alloc] initWithFrame:webView.bounds configuration:configuration];
+
+    popupView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+    popupView.navigationDelegate = self;
+    popupView.UIDelegate = self;
+    [webView addSubview:popupView];
+      
+    if (!navigationAction.targetFrame.isMainFrame) {
+        [popupView loadRequest:navigationAction.request];
+    }
+//    _resumeWebView = popupView;
+  
+    return popupView;
+}
+
+
+- (void)webViewDidClose:(WKWebView *)webView {
+    [webView removeFromSuperview];
 }
 
 - (WKWebViewConfiguration *)setUpWkWebViewConfig
