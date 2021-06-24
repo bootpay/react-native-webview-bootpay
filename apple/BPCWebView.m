@@ -948,16 +948,19 @@ static NSDictionary* customCertificatesForHost;
   decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
                   decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
-    NSLog(@"------- url: %@", navigationAction.request.URL.absoluteURL);
+//    NSLog(@"------- url: %@", navigationAction.request.URL.absoluteURL);
     if([self isItunesURL:navigationAction.request.URL.absoluteString]) {
-        [self openAppURL:navigationAction];
+//        [self openAppURL:navigationAction];
+//        decisionHandler(WKNavigationActionPolicyCancel);
+        [self startAppToApp:navigationAction.request.URL];
         decisionHandler(WKNavigationActionPolicyCancel);
     } else if(![navigationAction.request.URL.scheme isEqualToString:@"http"] && ![navigationAction.request.URL.scheme isEqualToString:@"https"]) {
-        if([[UIApplication sharedApplication]  canOpenURL: navigationAction.request.URL]) {
-            [self openAppURL:navigationAction];
-        } else {
-            [self goInstallApp: navigationAction];
-        }
+        [self startAppToApp:navigationAction.request.URL];
+//        if([[UIApplication sharedApplication]  canOpenURL: navigationAction.request.URL]) {
+//            [self openAppURL:navigationAction];
+//        } else {
+//            [self goInstallApp: navigationAction];
+//        }
         decisionHandler(WKNavigationActionPolicyCancel);
         
     } else {
@@ -1006,6 +1009,16 @@ static NSDictionary* customCertificatesForHost;
     }
     if([itunesUrl length] > 0) {
         [self openAppURLString: itunesUrl];
+    }
+}
+
+
+- (void) startAppToApp:(NSURL*)url {
+    UIApplication *application = [UIApplication sharedApplication];
+    if (@available(iOS 10.0, *)) {
+        [application openURL:url options:@{} completionHandler:nil];
+    } else {
+        [application openURL:url];
     }
 }
 
