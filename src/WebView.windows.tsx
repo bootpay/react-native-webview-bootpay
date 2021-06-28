@@ -38,7 +38,7 @@ import {
 const UIManager = NotTypedUIManager as BPCWebViewUIManagerWindows;
 const { resolveAssetSource } = Image;
 const RCTWebView: typeof NativeWebViewWindows = requireNativeComponent(
-  'RCTWebView',
+  'BPCWebView',
 );
 
 const styles = StyleSheet.create({
