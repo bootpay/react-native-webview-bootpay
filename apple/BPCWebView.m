@@ -19,7 +19,7 @@
 
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShimBootpay";
-static NSString *const MessageHandlerName = @"ReactNativeWebViewBootpay";
+static NSString *const MessageHandlerName = @"BootpayRNWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
