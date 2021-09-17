@@ -405,13 +405,13 @@ _Under the hood_
 > On iOS, `injectJavaScript` calls WebView's `evaluateJS:andThen:`
 > On Android, `injectJavaScript` calls Android WebView's `evaluateJavascriptWithFallback` method
 
-#### The `window.ReactNativeWebView.postMessage` method and `onMessage` prop
+#### The `window.BootpayRNWebView.postMessage` method and `onMessage` prop
 
-Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This is where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
+Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This is where `window.BootpayRNWebView.postMessage` and the `onMessage` prop come in.
 
-You _must_ set `onMessage` or the `window.ReactNativeWebView.postMessage` method will not be injected into the web page.
+You _must_ set `onMessage` or the `window.BootpayRNWebView.postMessage` method will not be injected into the web page.
 
-`window.ReactNativeWebView.postMessage` only accepts one argument which must be a string.
+`window.BootpayRNWebView.postMessage` only accepts one argument which must be a string.
 
 ```jsx
 import React, { Component } from 'react';
@@ -426,7 +426,7 @@ export default class App extends Component {
       <body>
         <script>
           setTimeout(function () {
-            window.ReactNativeWebView.postMessage("Hello!")
+            window.BootpayRNWebView.postMessage("Hello!")
           }, 2000)
         </script>
       </body>

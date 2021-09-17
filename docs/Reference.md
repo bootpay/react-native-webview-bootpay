@@ -166,7 +166,7 @@ Post message a JSON object of `window.location` to be handled by [`onMessage`](R
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
-    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
+    window.BootpayRNWebView.postMessage(JSON.stringify(window.location));
 })();`;
 
 <WebView
@@ -194,11 +194,11 @@ To learn more, read the [Communicating between JS and Native](Guide.md#communica
 
 Example:
 
-Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` _will_ be available at this time.
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.BootpayRNWebView.postMessage` _will_ be available at this time.
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
-    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
+    window.BootpayRNWebView.postMessage(JSON.stringify(window.location));
 })();`;
 
 <WebView
@@ -515,9 +515,9 @@ didCrash
 
 ### `onMessage`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`. Setting this property will inject this global into your webview.
+Function that is invoked when the webview calls `window.BootpayRNWebView.postMessage`. Setting this property will inject this global into your webview.
 
-`window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
+`window.BootpayRNWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
 
 | Type     | Required |
 | -------- | -------- |

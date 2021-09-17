@@ -198,30 +198,29 @@ static NSDictionary* customCertificatesForHost;
  */
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
-//  if (!navigationAction.targetFrame.isMainFrame) {
-//    [webView loadRequest:navigationAction.request];
-//  }
-//  return nil;
-    NSLog(@"------ popup url: %@", navigationAction.request.URL.absoluteString);
-//
-    WKWebView *popupView = [[WKWebView alloc] initWithFrame:webView.bounds configuration:configuration];
-//    [popupView loadRequest:navigationAction.request];
-//
-    popupView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
-    popupView.navigationDelegate = self;
-    popupView.UIDelegate = self;
-    [webView addSubview:popupView];
-//
-//    if (!navigationAction.targetFrame.isMainFrame) {
-//        [popupView loadRequest:navigationAction.request];
-//    }
-//    _resumeWebView = popupView;
-//
-    return popupView;
+    //팝업관련 
+    // NSLog(@"------ popup url: %@", navigationAction.request.URL.absoluteString);
+
+    if([navigationAction.request.URL.absoluteString rangeOfString:@"bootpay.co.kr"].location == NSNotFound) {
+      //원래 로직 
+      if (!navigationAction.targetFrame.isMainFrame) {
+        [webView loadRequest:navigationAction.request];
+      }
+      return nil;
+    } else {
+      WKWebView *popupView = [[WKWebView alloc] initWithFrame:webView.bounds configuration:configuration];
+
+      popupView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+      popupView.navigationDelegate = self;
+      popupView.UIDelegate = self;
+      [webView addSubview:popupView];
+  
+      return popupView;
+    } 
 }
 
 
-- (void)webViewDidClose:(WKWebView *)webView {
+- (void)webViewDidClose:(WKWebView *)webView { 
     [webView removeFromSuperview];
 }
 
@@ -968,15 +967,14 @@ static NSDictionary* customCertificatesForHost;
 - (void)                  webView:(WKWebView *)webView
   decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
                   decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
-{
-    NSLog(@"------- url: %@", navigationAction.request.URL.absoluteURL);
+{    
     if([self isItunesURL:navigationAction.request.URL.absoluteString]) { 
         [self startAppToApp:navigationAction.request.URL];
         decisionHandler(WKNavigationActionPolicyCancel);
-    } else if(![navigationAction.request.URL.scheme isEqualToString:@"http"] && ![navigationAction.request.URL.scheme isEqualToString:@"https"]) {
+    } else if(![navigationAction.request.URL.scheme isEqualToString:@"http"] && ![navigationAction.request.URL.scheme isEqualToString:@"https"] && ![navigationAction.request.URL.absoluteString isEqualToString:@"about:blank"]) {
         [self startAppToApp:navigationAction.request.URL];
         decisionHandler(WKNavigationActionPolicyCancel);
-    } else {
+    } else {      
         [self navigationOriginRN:webView decidePolicyForNavigationAction:navigationAction decisionHandler:decisionHandler];
     }
 }
@@ -1288,6 +1286,7 @@ static NSDictionary* customCertificatesForHost;
    * manually call [_webView loadRequest:request].
    */
   NSURLRequest *request = [self requestForSource:self.source];
+
 
   if (request.URL && !_webView.URL.absoluteString.length) {
     [_webView loadRequest:request];

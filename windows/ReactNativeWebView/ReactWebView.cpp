@@ -123,7 +123,7 @@ namespace winrt::ReactNativeWebView::implementation {
 
         if (m_messagingEnabled) {
           winrt::hstring windowAlert = L"window.alert = function (msg) {__REACT_WEB_VIEW_BRIDGE.postMessage(`{\"type\":\"__alert\",\"message\":\"${msg}\"}`)};";
-          winrt::hstring postMessage = L"window.ReactNativeWebView = {postMessage: function (data) {__REACT_WEB_VIEW_BRIDGE.postMessage(String(data))}};";
+          winrt::hstring postMessage = L"window.BootpayRNWebView = {postMessage: function (data) {__REACT_WEB_VIEW_BRIDGE.postMessage(String(data))}};";
           webView.InvokeScriptAsync(L"eval", { windowAlert + postMessage });
         }
     }
