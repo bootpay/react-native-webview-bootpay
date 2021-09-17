@@ -199,15 +199,20 @@ static NSDictionary* customCertificatesForHost;
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
     //팝업관련 
-    // NSLog(@"------ popup url: %@", navigationAction.request.URL.absoluteString);
+    NSLog(@"------ popup url: %@", navigationAction.request.URL.absoluteString);
 
     if([navigationAction.request.URL.absoluteString rangeOfString:@"bootpay.co.kr"].location == NSNotFound) {
+      NSLog(@"111");
+
       //원래 로직 
       if (!navigationAction.targetFrame.isMainFrame) {
         [webView loadRequest:navigationAction.request];
       }
       return nil;
     } else {
+
+      NSLog(@"222");
+
       WKWebView *popupView = [[WKWebView alloc] initWithFrame:webView.bounds configuration:configuration];
 
       popupView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
