@@ -18,8 +18,8 @@ yarn add react-native-webview-bootpay
 
 ```sh
 "dependencies": {
-    "react-native-webview-bootpay": last_version}
- ,
+    "react-native-webview-bootpay": last_version
+ }
 
 ```
 
