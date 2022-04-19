@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -195,6 +197,10 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
     params.height = ViewGroup.LayoutParams.MATCH_PARENT;
     popupDialog.getWindow().setAttributes((WindowManager.LayoutParams) params);
+    popupDialog.setOnDismissListener(dialog -> {
+      onCloseWindow(view);
+//      Toast.makeText(view.getContext(), "ㅍㅏㅂ업취소", Toast.LENGTH_SHORT).show();
+    });
     newWebView.setDialog(popupDialog);
     popupDialog.show();
 
