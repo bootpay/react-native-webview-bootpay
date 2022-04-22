@@ -198,8 +198,8 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
     params.height = ViewGroup.LayoutParams.MATCH_PARENT;
     popupDialog.getWindow().setAttributes((WindowManager.LayoutParams) params);
     popupDialog.setOnDismissListener(dialog -> {
-      onCloseWindow(view);
-//      Toast.makeText(view.getContext(), "ㅍㅏㅂ업취소", Toast.LENGTH_SHORT).show();
+//      Toast.makeText(view.getContext(), "팝업취소", Toast.LENGTH_SHORT).show();
+      onCloseWindow(view); //rn에선 딱히 동작하지 않음 
     });
     newWebView.setDialog(popupDialog);
     popupDialog.show();

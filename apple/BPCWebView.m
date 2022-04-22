@@ -985,73 +985,112 @@ static NSDictionary* customCertificatesForHost;
 }
 
 
-- (BOOL) isItunesURL:(NSString*) url {
-  NSString *itunesRegexp = @"\\/\\/itunes\\.apple\\.com\\/";
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", itunesRegexp];
-  return [predicate evaluateWithObject: url];
+- (NSString*) getQueryStringParameter:(NSString*)url :(NSString*)param {
+    NSMutableDictionary *queryStringDictionary = [[NSMutableDictionary alloc] init];
+    NSArray *urlComponents = [url componentsSeparatedByString:@"&"];
+    
+    for (NSString *keyValuePair in urlComponents)
+    {
+        NSArray *pairComponents = [keyValuePair componentsSeparatedByString:@"="];
+        NSString *key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
+        NSString *value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
+
+        if([param isEqualToString:key]) {
+            return value;
+        }
+    }
+    
+    return @"";
 }
 
-- (void) goInstallApp:(WKNavigationAction *)navigationAction {
-    NSString * url = navigationAction.request.URL.absoluteString;
-    NSString * itunesUrl = @"";
-    if([url hasPrefix:@"kftc-bankpay"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%EB%B1%85%ED%81%AC%ED%8E%98%EC%9D%B4-%EA%B8%88%EC%9C%B5%EA%B8%B0%EA%B4%80-%EA%B3%B5%EB%8F%99-%EA%B3%84%EC%A2%8C%EC%9D%B4%EC%B2%B4-%EA%B2%B0%EC%A0%9C-%EC%A0%9C%EB%A1%9C%ED%8E%98%EC%9D%B4/id398456030";
-    } else if([url hasPrefix:@"ispmobile"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/isp-%ED%8E%98%EC%9D%B4%EB%B6%81/id369125087";
-    } else if([url hasPrefix:@"hdcardappcardansimclick"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%ED%98%84%EB%8C%80%EC%B9%B4%EB%93%9C/id702653088";
-    }  else if([url hasPrefix:@"shinhan-sr-ansimclick"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%EC%8B%A0%ED%95%9C%ED%8E%98%EC%9D%B4%ED%8C%90/id572462317";
-    } else if([url hasPrefix:@"kb-acp"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/kb-pay/id695436326";
-    } else if([url hasPrefix:@"mpocket.online.ansimclick"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%EC%82%BC%EC%84%B1%EC%B9%B4%EB%93%9C/id535125356";
-    } else if([url hasPrefix:@"lottesmartpay"]) {
-        itunesUrl = @"https://apps.apple.com/us/app/%EB%A1%AF%EB%8D%B0%EC%B9%B4%EB%93%9C-%EC%95%B1%EC%B9%B4%EB%93%9C/id688047200";
-    } else if([url hasPrefix:@"lotteappcard"]) {
-        itunesUrl = @"https://apps.apple.com/us/app/%EB%A1%AF%EB%8D%B0%EC%B9%B4%EB%93%9C-%EC%95%B1%EC%B9%B4%EB%93%9C/id688047200";
-    } else if([url hasPrefix:@"cloudpay"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%ED%95%98%EB%82%98%EC%9B%90%ED%81%90-%EC%B9%B4%EB%93%9C-%ED%95%98%EB%82%98%EC%B9%B4%EB%93%9C/id427543371";
-    } else if([url hasPrefix:@"nhappvardansimclick"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%EC%98%AC%EC%9B%90%ED%8E%98%EC%9D%B4-nh%EC%95%B1%EC%B9%B4%EB%93%9C/id1177889176";
-    } else if([url hasPrefix:@"nhallonepayansimclick"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%EC%98%AC%EC%9B%90%ED%8E%98%EC%9D%B4-nh%EC%95%B1%EC%B9%B4%EB%93%9C/id1177889176";
-    } else if([url hasPrefix:@"citispay"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%EC%94%A8%ED%8B%B0%EB%AA%A8%EB%B0%94%EC%9D%BC/id1179759666";
-    } else if([url hasPrefix:@"payco"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/payco-%ED%8E%98%EC%9D%B4%EC%BD%94-%ED%98%9C%ED%83%9D%EA%B9%8C%EC%A7%80-%EB%98%91%EB%98%91%ED%95%9C-%EA%B0%84%ED%8E%B8%EA%B2%B0%EC%A0%9C/id924292102";
-    } else if([url hasPrefix:@"naversearchapp"]) {
-        itunesUrl = @"https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958";
-    }
-    if([itunesUrl length] > 0) {
-        [self openAppURLString: itunesUrl];
-    }
-}
-
-
-- (void) startAppToApp:(NSURL*)url {
+- (void) startAppToApp:(NSURL*) url {
     UIApplication *application = [UIApplication sharedApplication];
+    
+//    if (@available(iOS 10.0, *)) {
+//        [application openURL:url options:@{} completionHandler:nil];
+//    } else {
+//        [application openURL:url];
+//    }
+    
     if (@available(iOS 10.0, *)) {
-        [application openURL:url options:@{} completionHandler:nil];
+        [application openURL:url options:@{} completionHandler: ^(BOOL success) {
+            if(success == false) {
+                [self startItunesToInstall:url];
+            }
+        }];
     } else {
         [application openURL:url];
     }
 }
 
-- (void) openAppURL:(WKNavigationAction *)navigationAction {
-    if (@available(iOS 10.0, *)) {
-        [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:^(BOOL success) {}];
-    } else {
-        [[UIApplication sharedApplication] openURL:navigationAction.request.URL];
+
+- (void) startItunesToInstall:(NSURL*) url {
+    NSString *sUrl = url.absoluteString;
+    NSString *itunesUrl = @"";
+    
+    if([sUrl hasPrefix: @"kfc-bankpay"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%B1%85%ED%81%AC%ED%8E%98%EC%9D%B4-%EA%B8%88%EC%9C%B5%EA%B8%B0%EA%B4%80-%EA%B3%B5%EB%8F%99-%EA%B3%84%EC%A2%8C%EC%9D%B4%EC%B2%B4-%EA%B2%B0%EC%A0%9C-%EC%A0%9C%EB%A1%9C%ED%8E%98%EC%9D%B4/id398456030";
+    } else if([sUrl hasPrefix: @"ispmobile"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/isp/id369125087";
+    } else if([sUrl hasPrefix: @"hdcardappcardansimclick"] || [sUrl hasPrefix: @"smhyundaiansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%ED%98%84%EB%8C%80%EC%B9%B4%EB%93%9C/id702653088";
+    } else if([sUrl hasPrefix: @"shinhan-sr-ansimclick"] || [sUrl hasPrefix: @"smshinhanansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%8B%A0%ED%95%9C%ED%8E%98%EC%9D%B4%ED%8C%90/id572462317";
+    } else if([sUrl hasPrefix: @"kb-acp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/kb-pay/id695436326";
+    } else if([sUrl hasPrefix: @"liivbank"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%A6%AC%EB%B8%8C/id1126232922";
+    } else if([sUrl hasPrefix: @"mpocket.online.ansimclick"] || [sUrl hasPrefix: @"ansimclickscard"] || [sUrl hasPrefix: @"ansimclickipcollect"] || [sUrl hasPrefix: @"samsungpay"] || [sUrl hasPrefix: @"scardcertiapp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%82%BC%EC%84%B1%EC%B9%B4%EB%93%9C/id535125356";
+    } else if([sUrl hasPrefix: @"lottesmartpay"]) {
+        itunesUrl = @"https://apps.apple.com/us/app/%EB%A1%AF%EB%8D%B0%EC%B9%B4%EB%93%9C-%EC%95%B1%EC%B9%B4%EB%93%9C/id688047200";
+    } else if([sUrl hasPrefix: @"lotteappcard"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%94%94%EC%A7%80%EB%A1%9C%EC%B9%B4-%EB%A1%AF%EB%8D%B0%EC%B9%B4%EB%93%9C/id688047200";
+    } else if([sUrl hasPrefix: @"newsmartpib"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%9A%B0%EB%A6%AC-won-%EB%B1%85%ED%82%B9/id1470181651";
+    } else if([sUrl hasPrefix: @"com.wooricard.wcard"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%9A%B0%EB%A6%ACwon%EC%B9%B4%EB%93%9C/id1499598869";
+    } else if([sUrl hasPrefix: @"citispay"] || [sUrl hasPrefix: @"citicardappkr"] || [sUrl hasPrefix: @"citimobileapp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%94%A8%ED%8B%B0%EB%AA%A8%EB%B0%94%EC%9D%BC/id1179759666";
+    } else if([sUrl hasPrefix: @"shinsegaeeasypayment"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/ssgpay/id666237916";
+    } else if([sUrl hasPrefix: @"cloudpay"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%ED%95%98%EB%82%98%EC%B9%B4%EB%93%9C-%EC%9B%90%ED%81%90%ED%8E%98%EC%9D%B4/id847268987";
+    } else if([sUrl hasPrefix: @"hanawalletmembers"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/n-wallet/id492190784";
+    } else if([sUrl hasPrefix: @"nhappvardansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%98%AC%EC%9B%90%ED%8E%98%EC%9D%B4-nh%EC%95%B1%EC%B9%B4%EB%93%9C/id1177889176";
+    } else if([sUrl hasPrefix: @"nhallonepayansimclick"] || [sUrl hasPrefix: @"nhappcardansimclick"] || [sUrl hasPrefix: @"nhallonepayansimclick"] || [sUrl hasPrefix: @"nonghyupcardansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%98%AC%EC%9B%90%ED%8E%98%EC%9D%B4-nh%EC%95%B1%EC%B9%B4%EB%93%9C/id1177889176";
+    } else if([sUrl hasPrefix: @"payco"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/payco/id924292102";
+    } else if([sUrl hasPrefix: @"lpayapp"] || [sUrl hasPrefix: @"lmslpay"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/l-point-with-l-pay/id473250588";
+    } else if([sUrl hasPrefix: @"naversearchapp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958";
+    } else if([sUrl hasPrefix: @"tauthlink"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/pass-by-skt/id1141258007";
+    } else if([sUrl hasPrefix: @"uplusauth"] || [sUrl hasPrefix: @"upluscorporation"] ) {
+        itunesUrl = @"https://apps.apple.com/kr/app/pass-by-u/id1147394645";
+    } else if([sUrl hasPrefix: @"ktauthexternalcall"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/pass-by-kt/id1134371550";
+    } else if([sUrl hasPrefix: @"supertoss"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328";
+    } else if([sUrl hasPrefix: @"kakaotalk"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/kakaotalk/id362057947";
+    } else if([sUrl hasPrefix: @"chaipayment"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%B0%A8%EC%9D%B4/id1459979272";
+    }
+    
+    if(itunesUrl.length > 0) {
+        NSURL *appstore = [NSURL URLWithString: itunesUrl];
+        [self startAppToApp: appstore];
     }
 }
 
-- (void) openAppURLString:(NSString *)url {
-    if (@available(iOS 10.0, *)) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url] options:@{} completionHandler:^(BOOL success) {}];
-    } else {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
-    }
+- (BOOL) isItunesURL:(NSString*) urlString {
+    NSRange match = [urlString rangeOfString: @"itunes.apple.com"];
+    return match.location != NSNotFound;
 }
 
 

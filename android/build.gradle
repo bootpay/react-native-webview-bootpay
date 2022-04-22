@@ -9,18 +9,16 @@ buildscript {
   if (project == rootProject) {
     repositories {
       mavenCentral()
-      google()
-      jcenter()
+      google() 
     }
 
     dependencies {
-      classpath("com.android.tools.build:gradle:4.1.3")
+      classpath("com.android.tools.build:gradle:3.6.0")
       classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}")
     }
   } else {
     repositories {
-      mavenCentral()
-      jcenter()
+      mavenCentral() 
     }
 
     dependencies {
@@ -37,8 +35,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
-  buildToolsVersion getExtOrDefault('buildToolsVersion')
+  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion') 
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault('minSdkVersion')
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
@@ -60,8 +57,7 @@ android {
 }
 
 repositories {
-  mavenCentral()
-  jcenter()
+  mavenCentral() 
   google()
 
   def found = false
@@ -131,9 +127,11 @@ repositories {
 }
 
 def kotlin_version = getExtOrDefault('kotlinVersion')
+def webkit_version = getExtOrDefault('webkitVersion')
 
 dependencies {
   //noinspection GradleDynamicVersion
   implementation 'com.facebook.react:react-native:+'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "androidx.webkit:webkit:$webkit_version"
 }

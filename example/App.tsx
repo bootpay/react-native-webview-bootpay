@@ -12,7 +12,7 @@ export default class App extends Component {
     return (
       <SafeAreaView style={styles.container}>
         <WebView
-          source={{uri: "https://www.google.com"}}
+          source={{uri: "https://dev-js.bootapi.com/test/payment/"}}
           automaticallyAdjustContentInsets={false}
          
         />
