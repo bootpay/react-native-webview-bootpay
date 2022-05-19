@@ -1080,6 +1080,8 @@ static NSDictionary* customCertificatesForHost;
         itunesUrl = @"https://apps.apple.com/kr/app/kakaotalk/id362057947";
     } else if([sUrl hasPrefix: @"chaipayment"]) {
         itunesUrl = @"https://apps.apple.com/kr/app/%EC%B0%A8%EC%9D%B4/id1459979272";
+    } else if([sUrl hasPrefix: @"ukbanksmartbanknonloginpay"]) {
+        itunesUrl = @"https://itunes.apple.com/kr/developer/%EC%BC%80%EC%9D%B4%EB%B1%85%ED%81%AC/id1178872626?mt=8";
     }
     
     if(itunesUrl.length > 0) {
