@@ -54,6 +54,7 @@ public class BPCWebViewClient extends WebViewClient {
   @Override
   public void onPageFinished(WebView webView, String url) {
     super.onPageFinished(webView, url);
+    updateBlindViewIfNaverLogin(webView, url);
 
     if (!mLastLoadFailed) {
       BPCWebView reactWebView = (BPCWebView) webView;
@@ -62,6 +63,14 @@ public class BPCWebViewClient extends WebViewClient {
 
       emitFinishEvent(webView, url);
     }
+  }
+
+  private void updateBlindViewIfNaverLogin(WebView webView, String url) {
+      if(url.startsWith("https://nid.naver.com")) { //show
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+              webView.evaluateJavascript("document.getElementById('back').remove();", null);
+          }
+      }
   }
 
   @Override
