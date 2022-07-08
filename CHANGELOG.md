@@ -1,3 +1,6 @@
+## 11.18.16
+* react, react native 모든 버전 지원
+
 ## 11.18.15
 * naverpay back button deleted
 
