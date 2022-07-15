@@ -1,12 +1,12 @@
 package kr.co.bootpay.webview;
 
+import static kr.co.bootpay.webview.BPCWebViewManager.getModule;
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -21,12 +21,8 @@ import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -40,7 +36,6 @@ import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 import com.facebook.react.uimanager.ThemedReactContext;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,12 +91,17 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
     this.mWebView = webView;
   }
 
-//  Dialog popupDialog;
+  /** bootpay change **/
+
   @Override
   public void onCloseWindow(WebView window) {
     super.onCloseWindow(window);
     ((BPCWebView) window).dissmissDialog();
-    window.setVisibility(View.GONE);
+
+//    if(mainView != null) {
+//      mainView.removeView(window);
+//    }
+//    window.setVisibility(View.GONE);
   }
 
   void setWebSettingCopy(WebView view, WebView newWebView) {
@@ -152,14 +152,18 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       newWebView.getSettings().setForceDark(view.getSettings().getForceDark());
     }
-    
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       newWebView.getSettings().setDisabledActionModeMenuItems(view.getSettings().getDisabledActionModeMenuItems());
     }
   }
 
+//  WebView mainView;
   @Override
   public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+
+
+
 
     final BPCWebView newWebView = new BPCWebView((ThemedReactContext) view.getContext());
     BPCWebChromeClient client = new BPCWebChromeClient(this.mReactContext, view);
@@ -199,7 +203,7 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
     popupDialog.getWindow().setAttributes((WindowManager.LayoutParams) params);
     popupDialog.setOnDismissListener(dialog -> {
 //      Toast.makeText(view.getContext(), "팝업취소", Toast.LENGTH_SHORT).show();
-      onCloseWindow(view); //rn에선 딱히 동작하지 않음 
+      onCloseWindow(view); //rn에선 딱히 동작하지 않음
     });
     newWebView.setDialog(popupDialog);
     popupDialog.show();
@@ -209,6 +213,12 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
     resultMsg.sendToTarget();
 
     return true;
+//    final WebView newWebView = new WebView(view.getContext());
+//    final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+//    transport.setWebView(newWebView);
+//    resultMsg.sendToTarget();
+//
+//    return true;
   }
 
   @Override
@@ -234,8 +244,6 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
     event.putBoolean("canGoBack", webView.canGoBack());
     event.putBoolean("canGoForward", webView.canGoForward());
     event.putDouble("progress", (float) newProgress / 100);
-
-
     ((BPCWebView) webView).dispatchEvent(
       webView,
       new TopLoadingProgressEvent(
@@ -411,15 +419,15 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
   };
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-    BPCWebViewManager.getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptType);
+    getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptType);
   }
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-    BPCWebViewManager.getModule(mReactContext).startPhotoPickerIntent(filePathCallback, "");
+    getModule(mReactContext).startPhotoPickerIntent(filePathCallback, "");
   }
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-    BPCWebViewManager.getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptType);
+    getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptType);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -427,7 +435,7 @@ class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListen
   public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
     String[] acceptTypes = fileChooserParams.getAcceptTypes();
     boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-    return BPCWebViewManager.getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple);
+    return getModule(mReactContext).startPhotoPickerIntent(filePathCallback, acceptTypes, allowMultiple);
   }
 
   @Override

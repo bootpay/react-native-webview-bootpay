@@ -44,6 +44,7 @@ This document lays out the current public properties and methods for the React N
 - [`applicationNameForUserAgent`](Reference.md#applicationNameForUserAgent)
 - [`allowsFullscreenVideo`](Reference.md#allowsfullscreenvideo)
 - [`allowsInlineMediaPlayback`](Reference.md#allowsinlinemediaplayback)
+- [`allowsAirPlayForMediaPlayback`](Reference.md#allowsAirPlayForMediaPlayback)
 - [`bounces`](Reference.md#bounces)
 - [`overScrollMode`](Reference.md#overscrollmode)
 - [`contentInset`](Reference.md#contentinset)
@@ -51,6 +52,9 @@ This document lays out the current public properties and methods for the React N
 - [`contentMode`](Reference.md#contentMode)
 - [`dataDetectorTypes`](Reference.md#datadetectortypes)
 - [`scrollEnabled`](Reference.md#scrollenabled)
+- [`nestedScrollEnabled`](Reference.md#nestedscrollenabled)
+- [`setBuiltInZoomControls`](Reference.md#setBuiltInZoomControls)
+- [`setDisplayZoomControls`](Reference.md#setDisplayZoomControls)
 - [`directionalLockEnabled`](Reference.md#directionalLockEnabled)
 - [`geolocationEnabled`](Reference.md#geolocationenabled)
 - [`allowFileAccessFromFileURLs`](Reference.md#allowFileAccessFromFileURLs)
@@ -74,9 +78,17 @@ This document lays out the current public properties and methods for the React N
 - [`ignoreSilentHardwareSwitch`](Reference.md#ignoreSilentHardwareSwitch)
 - [`onFileDownload`](Reference.md#onFileDownload)
 - [`limitsNavigationsToAppBoundDomains`](Reference.md#limitsNavigationsToAppBoundDomains)
+- [`textInteractionEnabled`](Reference.md#textInteractionEnabled)
+- [`mediaCapturePermissionGrantType`](Reference.md#mediaCapturePermissionGrantType)
 - [`autoManageStatusBarEnabled`](Reference.md#autoManageStatusBarEnabled)
 - [`setSupportMultipleWindows`](Reference.md#setSupportMultipleWindows)
+- [`basicAuthCredential`](Reference.md#basicAuthCredential)
 - [`enableApplePay`](Reference.md#enableApplePay)
+- [`forceDarkOn`](Reference.md#forceDarkOn)
+- [`useWebView2`](Reference.md#useWebView2)
+- [`minimumFontSize`](Reference.md#minimumFontSize)
+- [`downloadingMessage`](Reference.md#downloadingMessage)
+- [`lackPermissionToDownloadMessage`](Reference.md#lackPermissionToDownloadMessage)
 
 ## Methods Index
 
@@ -166,7 +178,7 @@ Post message a JSON object of `window.location` to be handled by [`onMessage`](R
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
-    window.BootpayRNWebView.postMessage(JSON.stringify(window.location));
+    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
 })();`;
 
 <WebView
@@ -194,11 +206,11 @@ To learn more, read the [Communicating between JS and Native](Guide.md#communica
 
 Example:
 
-Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.BootpayRNWebView.postMessage` _will_ be available at this time.
+Post message a JSON object of `window.location` to be handled by [`onMessage`](Reference.md#onmessage). `window.ReactNativeWebView.postMessage` _will_ be available at this time.
 
 ```jsx
 const INJECTED_JAVASCRIPT = `(function() {
-    window.BootpayRNWebView.postMessage(JSON.stringify(window.location));
+    window.ReactNativeWebView.postMessage(JSON.stringify(window.location));
 })();`;
 
 <WebView
@@ -299,6 +311,8 @@ url
 
 > **_Note_**
 > Domain is only used on iOS
+
+The `syntheticEvent` can be stopped doing its default action by calling `syntheticEvent.preventDefault()`.
 
 ---
 
@@ -515,9 +529,9 @@ didCrash
 
 ### `onMessage`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Function that is invoked when the webview calls `window.BootpayRNWebView.postMessage`. Setting this property will inject this global into your webview.
+Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`. Setting this property will inject this global into your webview.
 
-`window.BootpayRNWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
+`window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be available on the event object, `event.nativeEvent.data`. `data` must be a string.
 
 | Type     | Required |
 | -------- | -------- |
@@ -563,11 +577,14 @@ url
 
 ### `onContentProcessDidTerminate`[⬆](#props-index)<!-- Link generated with jump2header -->
 
-Function that is invoked when the `WebView` content process is terminated.
+Function that is invoked when the `WebView` content process is terminated. 
 
 | Type     | Required | Platform                |
 | -------- | -------- | ----------------------- |
 | function | No       | iOS and macOS WKWebView |
+
+iOS Web views use a separate process to render and manage web content. WebKit calls this method when the process for the specified web view terminates for any reason. 
+The reason is not necessarily a crash. For instance, since iOS WebViews are not included in the total RAM of the app, they can be terminated independently of the app to liberate memory for new apps the user is opening. It's not unexpected to have WebViews get terminated after a while in the background.
 
 Example:
 
@@ -934,6 +951,15 @@ Boolean that determines whether HTML5 videos play inline or use the native full-
 | bool | No       | iOS      |
 
 ---
+### `allowsAirPlayForMediaPlayback`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+A Boolean value indicating whether AirPlay is allowed. The default value is `false`.
+
+| Type    | Required | Platform      |
+| ------- | -------- | ------------- |
+| boolean | No       | iOS and macOS |
+
+---
 
 ### `bounces`[⬆](#props-index)<!-- Link generated with jump2header -->
 
@@ -1037,6 +1063,38 @@ Boolean value that determines whether scrolling is enabled in the `WebView`. The
 | Type | Required | Platform      |
 | ---- | -------- | ------------- |
 | bool | No       | iOS and macOS |
+
+---
+
+### `nestedScrollEnabled`[⬆](#props-index)
+
+Boolean value that determines whether scrolling is possible in the `WebView` when used inside a `ScrollView` on Android. The default value is `false`. 
+
+Setting this to `true` will prevent the `ScrollView` to scroll when scrolling from inside the `WebView`.
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
+### `setBuiltInZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should use its built-in zoom mechanisms. The default value is `true`. Setting this to `false` will prevent the use of a pinch gesture to control zooming.
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
+
+---
+
+### `setDisplayZoomControls`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+Sets whether the WebView should display on-screen zoom controls when using the built-in zoom mechanisms (see `setBuiltInZoomControls`). The default value is `false`. 
+
+| Type | Required | Platform      |
+| ---- | -------- | ------------- |
+| bool | No       | Android       |
 
 ---
 
@@ -1336,6 +1394,50 @@ Example:
 
 ---
 
+### `textInteractionEnabled`[⬆](#props-index)<!-- Link generated with jump2header -->
+
+If false indicates to WebKit that a WKWebView will not interact with text, thus not showing a text selection loop. Only applicable for iOS 14.5 or greater.
+
+Defaults to true.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | iOS      |
+
+Example:
+
+```jsx
+<WebView textInteractionEnabled={false} />
+```
+
+---
+
+### `mediaCapturePermissionGrantType`
+
+This property specifies how to handle media capture permission requests. Defaults to `prompt`, resulting in the user being prompted repeatedly. Available on iOS 15 and later.
+
+Possible values:
+
+- `grantIfSameHostElsePrompt`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, the user gets prompted.
+- `grantIfSameHostElseDeny`: If the security origin's host of the permission request equals the host of the WebView's current URL, the permission is granted if it has been granted before. Otherwise, it gets denied.
+- `deny`
+- `grant`: The permission is granted if it has been granted before.
+- `prompt`
+
+Note that a grant may still result in a prompt, for example if the user has never been prompted for the permission before.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | iOS      |
+
+Example:
+
+```javascript
+<WebView mediaCapturePermissionGrantType={'grantIfSameHostElsePrompt'} />
+```
+
+---
+
 ### `autoManageStatusBarEnabled`
 
 If set to `true`, the status bar will be automatically hidden/shown by WebView, specifically when full screen video is being watched. If `false`, WebView will not manage the status bar at all. The default value is `true`.
@@ -1384,6 +1486,103 @@ Example:
 ```javascript
 <WebView enableApplePay={true} />
 ```
+
+### `forceDarkOn`
+
+Configuring Dark Theme
+
+*NOTE* : The force dark setting is not persistent. You must call the static method every time your app process is started.
+
+*NOTE* : The change from day<->night mode is a configuration change so by default the activity will be restarted and pickup the new values to apply the theme. Take care when overriding this default behavior to ensure this method is still called when changes are made.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Android  |
+
+Example:
+
+```javascript
+<WebView forceDarkOn={false} />
+```
+### `menuItems`
+
+An array of custom menu item objects that will be appended to the UIMenu that appears when selecting text (will appear after 'Copy' and 'Share...').  Used in tandem with `onCustomMenuSelection`
+
+Example:
+
+```javascript
+<WebView menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]} />
+```
+
+### `onCustomMenuSelection`
+
+Function called when a custom menu item is selected.  It receives a Native event, which includes three custom keys: `label`, `key` and `selectedText`.
+
+```javascript
+<WebView 
+  menuItems={[{ label: 'Tweet', key: 'tweet' }, { label: 'Save for later', key: 'saveForLater' }]}
+  onCustomMenuSelection={(webViewEvent) => {
+    const { label } = webViewEvent.nativeEvent; // The name of the menu item, i.e. 'Tweet'
+    const { key } = webViewEvent.nativeEvent; // The key of the menu item, i.e. 'tweet'
+    const { selectedText } = webViewEvent.nativeEvent; // Text highlighted
+  }}
+/>
+```
+
+### `basicAuthCredential`
+
+An object that specifies the credentials of a user to be used for basic authentication.
+
+- `username` (string) - A username used for basic authentication.
+- `password` (string) - A password used for basic authentication.
+
+| Type   | Required |
+| ------ | -------- |
+| object | No       |
+
+### `useWebView2`
+
+Use WinUI WebView2 control instead of WebView control as the native webview. The WebView2 control is a WinUI control that renders web content using the Microsoft Edge (Chromium) rendering engine. Option can be toggled at runtime and supports Fast Refresh.
+
+| Type    | Required | Platform |
+| ------- | -------- | -------- |
+| boolean | No       | Windows  |
+
+Example:
+
+```javascript
+<WebView useWebView2={true} />
+```
+
+### `minimumFontSize`
+
+Android enforces a minimum font size based on this value. A non-negative integer between 1 and 72. Any number outside the specified range will be pinned. Default value is 8. If you are using smaller font sizes and are having trouble fitting the whole window onto one screen, try setting this to a smaller value.
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| number | No       | Android  |
+
+Example:
+
+```javascript
+<WebView minimumFontSize={1} />
+```
+
+### `downloadingMessage`
+
+This is the message that is shown in the Toast when downloading a file via WebView. Default message is "Downloading".
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
+
+### `lackPermissionToDownloadMessage`
+
+This is the message that is shown in the Toast when the webview is unable to download a file. Default message is "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.".
+
+| Type   | Required | Platform |
+| ------ | -------- | -------- |
+| string | No       | Android  |
 
 ## Methods
 
@@ -1460,7 +1659,7 @@ Removes the autocomplete popup from the currently focused form field, if present
 (android only)
 
 ```javascript
-clearCache(true);
+clearCache(true)
 ```
 
 Clears the resource cache. Note that the cache is per-application, so this will clear the cache for all WebViews used. [developer.android.com reference](<https://developer.android.com/reference/android/webkit/WebView.html#clearCache(boolean)>)
@@ -1478,3 +1677,9 @@ Tells this WebView to clear its internal back/forward list. [developer.android.c
 ## Other Docs
 
 Also check out our [Getting Started Guide](Getting-Started.md) and [In-Depth Guide](Guide.md).
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Reference.portuguese.md)

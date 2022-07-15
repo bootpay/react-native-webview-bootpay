@@ -23,7 +23,7 @@ const HTML = `<!DOCTYPE html>\n
     <p id="demo"></p>    
     <script>
       function sendPostMessage() {
-        window.BootpayRNWebView.postMessage('Message from JS');
+        window.ReactNativeWebView.postMessage('Message from JS');
       }
 
       window.addEventListener('message',function(event){

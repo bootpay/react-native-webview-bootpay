@@ -259,7 +259,7 @@ To be able to save images to the gallery you need to specify this permission in 
 ##### Android
 
 On Android, integration with the DownloadManager is built-in.
-Add this permisison in AndroidManifest.xml (only required if your app supports Android versions lower than 10):
+Add this permission in AndroidManifest.xml (only required if your app supports Android versions lower than 10):
 
 ```xml
 <manifest ...>
@@ -405,13 +405,13 @@ _Under the hood_
 > On iOS, `injectJavaScript` calls WebView's `evaluateJS:andThen:`
 > On Android, `injectJavaScript` calls Android WebView's `evaluateJavascriptWithFallback` method
 
-#### The `window.BootpayRNWebView.postMessage` method and `onMessage` prop
+#### The `window.ReactNativeWebView.postMessage` method and `onMessage` prop
 
-Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This is where `window.BootpayRNWebView.postMessage` and the `onMessage` prop come in.
+Being able to send JavaScript to the web page is great, but what about when the web page wants to communicate back to your React Native code? This is where `window.ReactNativeWebView.postMessage` and the `onMessage` prop come in.
 
-You _must_ set `onMessage` or the `window.BootpayRNWebView.postMessage` method will not be injected into the web page.
+You _must_ set `onMessage` or the `window.ReactNativeWebView.postMessage` method will not be injected into the web page.
 
-`window.BootpayRNWebView.postMessage` only accepts one argument which must be a string.
+`window.ReactNativeWebView.postMessage` only accepts one argument which must be a string.
 
 ```jsx
 import React, { Component } from 'react';
@@ -426,7 +426,7 @@ export default class App extends Component {
       <body>
         <script>
           setTimeout(function () {
-            window.BootpayRNWebView.postMessage("Hello!")
+            window.ReactNativeWebView.postMessage("Hello!")
           }, 2000)
         </script>
       </body>
@@ -547,3 +547,9 @@ There are some inconsistencies in how the hardware silence switch is handled bet
 Audio on `iOS` will be muted when the hardware silence switch is in the on position, unless the `ignoreSilentHardwareSwitch` parameter is set to true.
 
 Video on `iOS` will always ignore the hardware silence switch.
+
+## Translations
+
+This file is available at:
+
+- [Brazilian portuguese](Guide.portuguese.md)

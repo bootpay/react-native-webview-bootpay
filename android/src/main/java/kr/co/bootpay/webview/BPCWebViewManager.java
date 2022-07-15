@@ -1,78 +1,43 @@
 package kr.co.bootpay.webview;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.Manifest;
-import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Message;
-import android.os.SystemClock;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
-import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
-import android.webkit.GeolocationPermissions;
-import android.webkit.JavascriptInterface;
-import android.webkit.RenderProcessGoneDetail;
-import android.webkit.SslErrorHandler;
-import android.webkit.PermissionRequest;
 import android.webkit.URLUtil;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
-import androidx.core.util.Pair;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewFeature;
 
-import com.facebook.common.logging.FLog;
-import com.facebook.react.modules.core.PermissionAwareActivity;
-import com.facebook.react.modules.core.PermissionListener;
-import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
-import com.facebook.react.views.scroll.OnScrollDispatchHelper;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.CatalystInstance;
-import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeArray;
-import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.common.build.ReactBuildConfig;
 import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.uimanager.events.ContentSizeChangeEvent;
-import com.facebook.react.uimanager.events.Event;
-import com.facebook.react.uimanager.events.EventDispatcher;
-import kr.co.bootpay.webview.BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState;
+
 import kr.co.bootpay.webview.events.TopLoadingErrorEvent;
 import kr.co.bootpay.webview.events.TopHttpErrorEvent;
 import kr.co.bootpay.webview.events.TopLoadingFinishEvent;
@@ -86,16 +51,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.IllegalArgumentException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Manages instances of {@link WebView}
@@ -123,6 +84,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @ReactModule(name = BPCWebViewManager.REACT_CLASS)
 public class BPCWebViewManager extends SimpleViewManager<WebView> {
+  private static final String TAG = "BPCWebViewManager";
 
   public static final int COMMAND_GO_BACK = 1;
   public static final int COMMAND_GO_FORWARD = 2;
@@ -141,17 +103,23 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
   protected static final String REACT_CLASS = "BPCWebView";
   protected static final String HTML_ENCODING = "UTF-8";
   protected static final String HTML_MIME_TYPE = "text/html";
-  // protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
+//  protected static final String JAVASCRIPT_INTERFACE = "ReactNativeWebView";
   protected static final String HTTP_METHOD_POST = "POST";
   // Use `webView.loadUrl("about:blank")` to reliably reset the view
   // state and release page resources (including any running JavaScript).
   protected static final String BLANK_URL = "about:blank";
+  protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
+  protected static final String DEFAULT_DOWNLOADING_MESSAGE = "Downloading";
+  protected static final String DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE =
+    "Cannot download files as permission was denied. Please provide permission to write to storage, in order to download files.";
   protected WebViewConfig mWebViewConfig;
 
   protected BPCWebChromeClient mWebChromeClient = null;
   protected boolean mAllowsFullscreenVideo = false;
   protected @Nullable String mUserAgent = null;
   protected @Nullable String mUserAgentWithApplicationName = null;
+  protected @Nullable String mDownloadingMessage = null;
+  protected @Nullable String mLackPermissionToDownloadMessage = null;
 
   public BPCWebViewManager() {
     mWebViewConfig = new WebViewConfig() {
@@ -209,7 +177,13 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
 
         BPCWebViewModule module = getModule(reactContext);
 
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        DownloadManager.Request request;
+        try {
+          request = new DownloadManager.Request(Uri.parse(url));
+        } catch (IllegalArgumentException e) {
+          Log.w(TAG, "Unsupported URI, aborting download", e);
+          return;
+        }
 
         String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
         String downloadMessage = "Downloading " + fileName;
@@ -222,8 +196,7 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
           String cookie = CookieManager.getInstance().getCookie(baseUrl);
           request.addRequestHeader("Cookie", cookie);
         } catch (MalformedURLException e) {
-          System.out.println("Error getting cookie for DownloadManager: " + e.toString());
-          e.printStackTrace();
+          Log.w(TAG, "Error getting cookie for DownloadManager", e);
         }
 
         //Finish setting up request
@@ -236,8 +209,8 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
 
         module.setDownloadRequest(request);
 
-        if (module.grantFileDownloaderPermissions()) {
-          module.downloadFile();
+        if (module.grantFileDownloaderPermissions(getDownloadingMessage(), getLackPermissionToDownloadMessage())) {
+          module.downloadFile(getDownloadingMessage());
         }
       }
     });
@@ -245,9 +218,27 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
     return webView;
   }
 
+  private String getDownloadingMessage() {
+    return  mDownloadingMessage == null ? DEFAULT_DOWNLOADING_MESSAGE : mDownloadingMessage;
+  }
+
+  private String getLackPermissionToDownloadMessage() {
+    return  mDownloadingMessage == null ? DEFAULT_LACK_PERMISSION_TO_DOWNLOAD_MESSAGE : mLackPermissionToDownloadMessage;
+  }
+
   @ReactProp(name = "javaScriptEnabled")
   public void setJavaScriptEnabled(WebView view, boolean enabled) {
     view.getSettings().setJavaScriptEnabled(enabled);
+  }
+
+  @ReactProp(name = "setBuiltInZoomControls")
+  public void setBuiltInZoomControls(WebView view, boolean enabled) {
+    view.getSettings().setBuiltInZoomControls(enabled);
+  }
+
+  @ReactProp(name = "setDisplayZoomControls")
+  public void setDisplayZoomControls(WebView view, boolean enabled) {
+    view.getSettings().setDisplayZoomControls(enabled);
   }
 
   @ReactProp(name = "setSupportMultipleWindows")
@@ -265,18 +256,25 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
     view.setVerticalScrollBarEnabled(enabled);
   }
 
+  @ReactProp(name = "downloadingMessage")
+  public void setDownloadingMessage(WebView view, String message) {
+    mDownloadingMessage = message;
+  }
+
+  @ReactProp(name = "lackPermissionToDownloadMessage")
+  public void setLackPermissionToDownlaodMessage(WebView view, String message) {
+    mLackPermissionToDownloadMessage = message;
+  }
+
   @ReactProp(name = "cacheEnabled")
   public void setCacheEnabled(WebView view, boolean enabled) {
     if (enabled) {
       Context ctx = view.getContext();
       if (ctx != null) {
-        view.getSettings().setAppCachePath(ctx.getCacheDir().getAbsolutePath());
         view.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-        view.getSettings().setAppCacheEnabled(true);
       }
     } else {
       view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-      view.getSettings().setAppCacheEnabled(false);
     }
   }
 
@@ -339,6 +337,11 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
         break;
     }
     view.setOverScrollMode(overScrollMode);
+  }
+
+  @ReactProp(name = "nestedScrollEnabled")
+  public void setNestedScrollEnabled(WebView view, boolean enabled) {
+    ((BPCWebView) view).setNestedScrollEnabled(enabled);
   }
 
   @ReactProp(name = "thirdPartyCookiesEnabled")
@@ -470,7 +473,6 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
 
     // Disable caching
     view.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-    view.getSettings().setAppCacheEnabled(false);
     view.clearHistory();
     view.clearCache(true);
 
@@ -536,6 +538,19 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
     view.loadUrl(BLANK_URL);
   }
 
+  @ReactProp(name = "basicAuthCredential")
+  public void setBasicAuthCredential(WebView view, @Nullable ReadableMap credential) {
+    @Nullable BasicAuthCredential basicAuthCredential = null;
+    if (credential != null) {
+      if (credential.hasKey("username") && credential.hasKey("password")) {
+        String username = credential.getString("username");
+        String password = credential.getString("password");
+        basicAuthCredential = new BasicAuthCredential(username, password);
+      }
+    }
+    ((BPCWebView) view).setBasicAuthCredential(basicAuthCredential);
+  }
+
   @ReactProp(name = "onContentSizeChange")
   public void setOnContentSizeChange(WebView view, boolean sendContentSizeChangeEvents) {
     ((BPCWebView) view).setSendContentSizeChangeEvents(sendContentSizeChangeEvents);
@@ -591,6 +606,32 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
     ((BPCWebView) view).setHasScrollEvent(hasScrollEvent);
   }
 
+  @ReactProp(name = "forceDarkOn")
+  public void setForceDarkOn(WebView view, boolean enabled) {
+    // Only Android 10+ support dark mode
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+      // Switch WebView dark mode
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+        int forceDarkMode = enabled ? WebSettingsCompat.FORCE_DARK_ON : WebSettingsCompat.FORCE_DARK_OFF;
+        WebSettingsCompat.setForceDark(view.getSettings(), forceDarkMode);
+      }
+
+      // Set how WebView content should be darkened.
+      // PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING:  checks for the "color-scheme" <meta> tag.
+      // If present, it uses media queries. If absent, it applies user-agent (automatic)
+      // More information about Force Dark Strategy can be found here:
+      // https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setForceDarkStrategy(android.webkit.WebSettings)
+      if (enabled && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
+        WebSettingsCompat.setForceDarkStrategy(view.getSettings(), WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING);
+      }
+    }
+  }
+
+  @ReactProp(name = "minimumFontSize")
+  public void setMinimumFontSize(WebView view, int fontSize) {
+    view.getSettings().setMinimumFontSize(fontSize);
+  }
+
   @Override
   protected void addEventEmitters(ThemedReactContext reactContext, WebView view) {
     // Do not register default touch emitter and let WebView implementation handle touches
@@ -603,6 +644,13 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
     if (export == null) {
       export = MapBuilder.newHashMap();
     }
+    // Default events but adding them here explicitly for clarity
+    export.put(TopLoadingStartEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingStart"));
+    export.put(TopLoadingFinishEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingFinish"));
+    export.put(TopLoadingErrorEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingError"));
+    export.put(TopMessageEvent.EVENT_NAME, MapBuilder.of("registrationName", "onMessage"));
+    // !Default events but adding them here explicitly for clarity
+
     export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
     export.put(ScrollEventType.getJSEventName(ScrollEventType.SCROLL), MapBuilder.of("registrationName", "onScroll"));
@@ -630,21 +678,21 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   @Override
-  public void receiveCommand(WebView root, int commandId, @Nullable ReadableArray args) {
+  public void receiveCommand(@NonNull WebView root, String commandId, @Nullable ReadableArray args) {
     switch (commandId) {
-      case COMMAND_GO_BACK:
+      case "goBack":
         root.goBack();
         break;
-      case COMMAND_GO_FORWARD:
+      case "goForward":
         root.goForward();
         break;
-      case COMMAND_RELOAD:
+      case "reload":
         root.reload();
         break;
-      case COMMAND_STOP_LOADING:
+      case "stopLoading":
         root.stopLoading();
         break;
-      case COMMAND_POST_MESSAGE:
+      case "postMessage":
         try {
           BPCWebView reactWebView = (BPCWebView) root;
           JSONObject eventInitDict = new JSONObject();
@@ -664,31 +712,32 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
           throw new RuntimeException(e);
         }
         break;
-      case COMMAND_INJECT_JAVASCRIPT:
+      case "injectJavaScript":
         BPCWebView reactWebView = (BPCWebView) root;
         reactWebView.evaluateJavascriptWithFallback(args.getString(0));
         break;
-      case COMMAND_LOAD_URL:
+      case "loadUrl":
         if (args == null) {
           throw new RuntimeException("Arguments for loading an url are null!");
         }
         ((BPCWebView) root).progressChangedFilter.setWaitingForCommandLoadUrl(false);
         root.loadUrl(args.getString(0));
         break;
-      case COMMAND_FOCUS:
+      case "requestFocus":
         root.requestFocus();
         break;
-      case COMMAND_CLEAR_FORM_DATA:
+      case "clearFormData":
         root.clearFormData();
         break;
-      case COMMAND_CLEAR_CACHE:
+      case "clearCache":
         boolean includeDiskFiles = args != null && args.getBoolean(0);
         root.clearCache(includeDiskFiles);
         break;
-      case COMMAND_CLEAR_HISTORY:
+      case "clearHistory":
         root.clearHistory();
         break;
     }
+    super.receiveCommand(root, commandId, args);
   }
 
   @Override
@@ -704,8 +753,11 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
   }
 
   protected void setupWebChromeClient(ReactContext reactContext, WebView webView) {
-    if (mAllowsFullscreenVideo) {
-      int initialRequestedOrientation = reactContext.getCurrentActivity().getRequestedOrientation();
+    Activity activity = reactContext.getCurrentActivity();
+
+    if (mAllowsFullscreenVideo && activity != null) {
+      int initialRequestedOrientation = activity.getRequestedOrientation();
+
       mWebChromeClient = new BPCWebChromeClient(reactContext, webView) {
         @Override
         public Bitmap getDefaultVideoPoster() {
@@ -722,31 +774,32 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
           mVideoView = view;
           mCustomViewCallback = callback;
 
-          mReactContext.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+          activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mVideoView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY);
-            mReactContext.getCurrentActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            activity.getWindow().setFlags(
+              WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+              WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+            );
           }
 
           mVideoView.setBackgroundColor(Color.BLACK);
 
-          // since RN's Modals interfere with the View hierarchy
-          // we will decide which View to Hide if the hierarchy
-          // does not match (i.e., the webview is within a Modal)
-          // NOTE: We could use mWebView.getRootView() instead of getRootView()
+          // Since RN's Modals interfere with the View hierarchy
+          // we will decide which View to hide if the hierarchy
+          // does not match (i.e., the WebView is within a Modal)
+          // NOTE: We could use `mWebView.getRootView()` instead of `getRootView()`
           // but that breaks the Modal's styles and layout, so we need this to render
-          // in the main View hierarchy regardless.
+          // in the main View hierarchy regardless
           ViewGroup rootView = getRootView();
           rootView.addView(mVideoView, FULLSCREEN_LAYOUT_PARAMS);
 
           // Different root views, we are in a Modal
-          if(rootView.getRootView() != mWebView.getRootView()){
+          if (rootView.getRootView() != mWebView.getRootView()) {
             mWebView.getRootView().setVisibility(View.GONE);
-          }
-
-          // Same view hierarchy (no Modal), just hide the webview then
-          else{
+          } else {
+            // Same view hierarchy (no Modal), just hide the WebView then
             mWebView.setVisibility(View.GONE);
           }
 
@@ -759,20 +812,18 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
             return;
           }
 
-          // same logic as above
+          // Same logic as above
           ViewGroup rootView = getRootView();
 
-          if(rootView.getRootView() !=  mWebView.getRootView()){
+          if (rootView.getRootView() != mWebView.getRootView()) {
             mWebView.getRootView().setVisibility(View.VISIBLE);
-          }
-
-          // Same view hierarchy (no Modal)
-          else{
+          } else {
+            // Same view hierarchy (no Modal)
             mWebView.setVisibility(View.VISIBLE);
           }
 
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mReactContext.getCurrentActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
           }
 
           rootView.removeView(mVideoView);
@@ -781,23 +832,27 @@ public class BPCWebViewManager extends SimpleViewManager<WebView> {
           mVideoView = null;
           mCustomViewCallback = null;
 
-          mReactContext.getCurrentActivity().setRequestedOrientation(initialRequestedOrientation);
+          activity.setRequestedOrientation(initialRequestedOrientation);
 
           mReactContext.removeLifecycleEventListener(this);
         }
       };
+
       webView.setWebChromeClient(mWebChromeClient);
     } else {
       if (mWebChromeClient != null) {
         mWebChromeClient.onHideCustomView();
       }
+
       mWebChromeClient = new BPCWebChromeClient(reactContext, webView) {
         @Override
         public Bitmap getDefaultVideoPoster() {
           return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
         }
       };
+
       webView.setWebChromeClient(mWebChromeClient);
     }
   }
+
 }

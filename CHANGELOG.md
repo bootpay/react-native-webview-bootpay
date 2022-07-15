@@ -1,3 +1,10 @@
+
+## 11.22.7
+* react-native-webview 11.22.7 forked 
+* 이존 기능 유지 
+* app scheme 추가
+
+
 ## 11.18.16
 * react, react native 모든 버전 지원
 

@@ -14,7 +14,7 @@ export default class Alerts extends Component<Props, State> {
             <View style={{ flex: 1 }}>
                 <WebView
                     enableApplePay={true}
-                    source={{uri: "https://applepaydemo.apple.com2/"}}
+                    source={{uri: "https://applepaydemo.apple.com/"}}
                     automaticallyAdjustContentInsets={false}
                 />
             </View>

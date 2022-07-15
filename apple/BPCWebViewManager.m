@@ -17,10 +17,20 @@
 @implementation RCTConvert (WKWebView)
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000 /* iOS 13 */
 RCT_ENUM_CONVERTER(WKContentMode, (@{
-    @"recommended": @(WKContentModeRecommended),
-    @"mobile": @(WKContentModeMobile),
-    @"desktop": @(WKContentModeDesktop),
+  @"recommended": @(WKContentModeRecommended),
+  @"mobile": @(WKContentModeMobile),
+  @"desktop": @(WKContentModeDesktop),
 }), WKContentModeRecommended, integerValue)
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+RCT_ENUM_CONVERTER(BPCWebViewPermissionGrantType, (@{
+  @"grantIfSameHostElsePrompt": @(BPCWebViewPermissionGrantType_GrantIfSameHost_ElsePrompt),
+  @"grantIfSameHostElseDeny": @(BPCWebViewPermissionGrantType_GrantIfSameHost_ElseDeny),
+  @"deny": @(BPCWebViewPermissionGrantType_Deny),
+  @"grant": @(BPCWebViewPermissionGrantType_Grant),
+  @"prompt": @(BPCWebViewPermissionGrantType_Prompt),
+}), BPCWebViewPermissionGrantType_Prompt, integerValue)
 #endif
 @end
 
@@ -61,6 +71,7 @@ RCT_EXPORT_VIEW_PROPERTY(javaScriptCanOpenWindowsAutomatically, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowFileAccessFromFileURLs, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowUniversalAccessFromFileURLs, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsInlineMediaPlayback, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(allowsAirPlayForMediaPlayback, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(mediaPlaybackRequiresUserAction, BOOL)
 #if WEBKIT_IOS_10_APIS_AVAILABLE
 RCT_EXPORT_VIEW_PROPERTY(dataDetectorTypes, WKDataDetectorTypes)
@@ -72,11 +83,11 @@ RCT_EXPORT_VIEW_PROPERTY(hideKeyboardAccessoryView, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsBackForwardNavigationGestures, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(incognito, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(pagingEnabled, BOOL)
-RCT_EXPORT_VIEW_PROPERTY(userAgent, NSString)
 RCT_EXPORT_VIEW_PROPERTY(applicationNameForUserAgent, NSString)
 RCT_EXPORT_VIEW_PROPERTY(cacheEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowsLinkPreview, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(allowingReadAccessToURL, NSString)
+RCT_EXPORT_VIEW_PROPERTY(basicAuthCredential, NSDictionary)
 
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 /* __IPHONE_11_0 */
 RCT_EXPORT_VIEW_PROPERTY(contentInsetAdjustmentBehavior, UIScrollViewContentInsetAdjustmentBehavior)
@@ -93,6 +104,14 @@ RCT_EXPORT_VIEW_PROPERTY(contentMode, WKContentMode)
 RCT_EXPORT_VIEW_PROPERTY(limitsNavigationsToAppBoundDomains, BOOL)
 #endif
 
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
+RCT_EXPORT_VIEW_PROPERTY(textInteractionEnabled, BOOL)
+#endif
+
+#if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 150000 /* iOS 15 */
+RCT_EXPORT_VIEW_PROPERTY(mediaCapturePermissionGrantType, BPCWebViewPermissionGrantType)
+#endif
+
 /**
  * Expose methods to enable messaging the webview.
  */
@@ -100,6 +119,8 @@ RCT_EXPORT_VIEW_PROPERTY(messagingEnabled, BOOL)
 RCT_EXPORT_VIEW_PROPERTY(onMessage, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onScroll, RCTDirectEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(enableApplePay, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(menuItems, NSArray);
+RCT_EXPORT_VIEW_PROPERTY(onCustomMenuSelection, RCTDirectEventBlock)
 
 RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)message)
 {
@@ -114,7 +135,7 @@ RCT_EXPORT_METHOD(postMessage:(nonnull NSNumber *)reactTag message:(NSString *)m
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(pullToRefreshEnabled, BOOL, BPCWebView) {
-    view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];
+  view.pullToRefreshEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(bounces, BOOL, BPCWebView) {
@@ -125,12 +146,16 @@ RCT_CUSTOM_VIEW_PROPERTY(useSharedProcessPool, BOOL, BPCWebView) {
   view.useSharedProcessPool = json == nil ? true : [RCTConvert BOOL: json];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(userAgent, NSString, BPCWebView) {
+  view.userAgent = [RCTConvert NSString: json];
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(scrollEnabled, BOOL, BPCWebView) {
   view.scrollEnabled = json == nil ? true : [RCTConvert BOOL: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(sharedCookiesEnabled, BOOL, BPCWebView) {
-    view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
+  view.sharedCookiesEnabled = json == nil ? false : [RCTConvert BOOL: json];
 }
 
 #if !TARGET_OS_OSX
@@ -140,7 +165,7 @@ RCT_CUSTOM_VIEW_PROPERTY(decelerationRate, CGFloat, BPCWebView) {
 #endif // !TARGET_OS_OSX
 
 RCT_CUSTOM_VIEW_PROPERTY(directionalLockEnabled, BOOL, BPCWebView) {
-    view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
+  view.directionalLockEnabled = json == nil ? true : [RCTConvert BOOL: json];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(showsHorizontalScrollIndicator, BOOL, BPCWebView) {
@@ -215,6 +240,18 @@ RCT_EXPORT_METHOD(stopLoading:(nonnull NSNumber *)reactTag)
   }];
 }
 
+RCT_EXPORT_METHOD(requestFocus:(nonnull NSNumber *)reactTag)
+{
+  [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, BPCWebView *> *viewRegistry) {
+    BPCWebView *view = viewRegistry[reactTag];
+    if (![view isKindOfClass:[BPCWebView class]]) {
+      RCTLogError(@"Invalid view returned from registry, expecting BPCWebView, got: %@", view);
+    } else {
+      [view requestFocus];
+    }
+  }];
+}
+
 #pragma mark - Exported synchronous methods
 
 - (BOOL)          webView:(BPCWebView *)webView
@@ -225,7 +262,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
   _shouldStartLoad = YES;
   request[@"lockIdentifier"] = @(_shouldStartLoadLock.condition);
   callback(request);
-
+  
   // Block the main thread for a maximum of 250ms until the JS thread returns
   if ([_shouldStartLoadLock lockWhenCondition:0 beforeDate:[NSDate dateWithTimeIntervalSinceNow:.25]]) {
     BOOL returnValue = _shouldStartLoad;

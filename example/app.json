@@ -1,6 +1,6 @@
 {
-  "name": "example",
-  "displayName": "example",
+  "name": "WebviewExample",
+  "displayName": "WebviewExample",
   "components": [
     {
       "appKey": "WebviewExample",

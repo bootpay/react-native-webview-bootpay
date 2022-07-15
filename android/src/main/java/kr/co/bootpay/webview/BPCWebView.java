@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Build;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -32,14 +33,14 @@ import java.net.URLEncoder;
 
 import kr.co.bootpay.webview.events.TopMessageEvent;
 
-
-
 /**
  * Subclass of {@link WebView} that implements {@link LifecycleEventListener} interface in order
  * to call {@link WebView#destroy} on activity destroy event and also to clear the client
  */
-
 class BPCWebView extends WebView implements LifecycleEventListener {
+
+  /** bootpay added start ***/
+  protected static final String JAVASCRIPT_INTERFACE = "BootpayRNWebView";
   Dialog dialog; //popup dialog
   public void setDialog(Dialog dialog) {
     this.dialog = dialog;
@@ -49,6 +50,7 @@ class BPCWebView extends WebView implements LifecycleEventListener {
     if(this.dialog != null) this.dialog.dismiss();
     this.dialog = null;
   }
+  /** bootpay added end ***/
 
   protected @Nullable
   String injectedJS;
@@ -66,15 +68,14 @@ class BPCWebView extends WebView implements LifecycleEventListener {
   protected @Nullable
   String messagingModuleName;
   protected @Nullable
-  BPCWebViewClient mbpCWebViewlient;
+  BPCWebViewClient mBPCWebViewClient;
   protected @Nullable
   CatalystInstance mCatalystInstance;
   protected boolean sendContentSizeChangeEvents = false;
   private OnScrollDispatchHelper mOnScrollDispatchHelper;
   protected boolean hasScrollEvent = false;
+  protected boolean nestedScrollEnabled = false;
   protected ProgressChangedFilter progressChangedFilter;
-
-  protected static final String JAVASCRIPT_INTERFACE = "BootpayRNWebView";
 
   /**
    * WebView must be created with an context of the current activity
@@ -89,7 +90,11 @@ class BPCWebView extends WebView implements LifecycleEventListener {
   }
 
   public void setIgnoreErrFailedForThisURL(String url) {
-    mbpCWebViewlient.setIgnoreErrFailedForThisURL(url);
+    mBPCWebViewClient.setIgnoreErrFailedForThisURL(url);
+  }
+
+  public void setBasicAuthCredential(BasicAuthCredential credential) {
+    mBPCWebViewClient.setBasicAuthCredential(credential);
   }
 
   public void setSendContentSizeChangeEvents(boolean sendContentSizeChangeEvents) {
@@ -98,6 +103,10 @@ class BPCWebView extends WebView implements LifecycleEventListener {
 
   public void setHasScrollEvent(boolean hasScrollEvent) {
     this.hasScrollEvent = hasScrollEvent;
+  }
+
+  public void setNestedScrollEnabled(boolean nestedScrollEnabled) {
+    this.nestedScrollEnabled = nestedScrollEnabled;
   }
 
   @Override
@@ -113,6 +122,14 @@ class BPCWebView extends WebView implements LifecycleEventListener {
   @Override
   public void onHostDestroy() {
     cleanupCallbacksAndDestroy();
+  }
+
+  @Override
+  public boolean onTouchEvent(MotionEvent event) {
+    if (this.nestedScrollEnabled) {
+      requestDisallowInterceptTouchEvent(true);
+    }
+    return super.onTouchEvent(event);
   }
 
   @Override
@@ -135,8 +152,8 @@ class BPCWebView extends WebView implements LifecycleEventListener {
   public void setWebViewClient(WebViewClient client) {
     super.setWebViewClient(client);
     if (client instanceof BPCWebViewClient) {
-      mbpCWebViewlient = (BPCWebViewClient) client;
-      mbpCWebViewlient.setProgressChangedFilter(progressChangedFilter);
+      mBPCWebViewClient = (BPCWebViewClient) client;
+      mBPCWebViewClient.setProgressChangedFilter(progressChangedFilter);
     }
   }
 
@@ -152,7 +169,7 @@ class BPCWebView extends WebView implements LifecycleEventListener {
 
   public @Nullable
   BPCWebViewClient getBPCWebViewClient() {
-    return mbpCWebViewlient;
+    return mBPCWebViewClient;
   }
 
   public void setInjectedJavaScript(@Nullable String js) {
@@ -236,15 +253,15 @@ class BPCWebView extends WebView implements LifecycleEventListener {
     ReactContext reactContext = (ReactContext) this.getContext();
     BPCWebView mContext = this;
 
-    if (mbpCWebViewlient != null) {
+    if (mBPCWebViewClient != null) {
       WebView webView = this;
       webView.post(new Runnable() {
         @Override
         public void run() {
-          if (mbpCWebViewlient == null) {
+          if (mBPCWebViewClient == null) {
             return;
           }
-          WritableMap data = mbpCWebViewlient.createWebViewEvent(webView, webView.getUrl());
+          WritableMap data = mBPCWebViewClient.createWebViewEvent(webView, webView.getUrl());
           data.putString("data", message);
 
           if (mCatalystInstance != null) {

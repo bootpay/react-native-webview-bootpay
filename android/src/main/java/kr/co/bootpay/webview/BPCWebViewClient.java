@@ -10,6 +10,7 @@ import android.net.http.SslError;
 import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
+import android.webkit.HttpAuthHandler;
 import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
@@ -37,126 +38,19 @@ import kr.co.bootpay.webview.events.TopLoadingStartEvent;
 import kr.co.bootpay.webview.events.TopRenderProcessGoneEvent;
 import kr.co.bootpay.webview.events.TopShouldStartLoadWithRequestEvent;
 
-public class BPCWebViewClient extends WebViewClient {
+class BPCWebViewClient extends WebViewClient {
+
+  /** bootpay added start ***/
   private static final String TAG = "BPCWebViewClient";
   protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
 
-  protected boolean mLastLoadFailed = false;
-  protected @Nullable
-  ReadableArray mUrlPrefixesForDefaultIntent;
-  protected BPCWebView.ProgressChangedFilter progressChangedFilter = null;
-  protected @Nullable String ignoreErrFailedForThisURL = null;
-
-  public void setIgnoreErrFailedForThisURL(@Nullable String url) {
-    ignoreErrFailedForThisURL = url;
-  }
-
-  @Override
-  public void onPageFinished(WebView webView, String url) {
-    super.onPageFinished(webView, url);
-    updateBlindViewIfNaverLogin(webView, url);
-
-    if (!mLastLoadFailed) {
-      BPCWebView reactWebView = (BPCWebView) webView;
-
-      reactWebView.callInjectedJavaScript();
-
-      emitFinishEvent(webView, url);
-    }
-  }
-
   private void updateBlindViewIfNaverLogin(WebView webView, String url) {
-      if(url.startsWith("https://nid.naver.com")) { //show
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-              webView.evaluateJavascript("document.getElementById('back').remove();", null);
-          }
+    if(url.startsWith("https://nid.naver.com")) { //show
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        webView.evaluateJavascript("document.getElementById('back').remove();", null);
       }
-  }
-
-  @Override
-  public void onPageStarted(WebView webView, String url, Bitmap favicon) {
-    super.onPageStarted(webView, url, favicon);
-    mLastLoadFailed = false;
-
-    BPCWebView reactWebView = (BPCWebView) webView;
-    reactWebView.callInjectedJavaScriptBeforeContentLoaded();
-
-    ((BPCWebView) webView).dispatchEvent(
-      webView,
-      new TopLoadingStartEvent(
-        webView.getId(),
-        createWebViewEvent(webView, url)));
-  }
-
-  @Override
-  public boolean shouldOverrideUrlLoading(WebView view, String url) {
-    Intent intent = getIntentWithPackage(url);
-    Context context = view.getContext();
-
-    if(isIntent(url)) {
-      if(isInstallApp(intent, context)) return startApp(intent, context);
-      else return startGooglePlay(intent, context);
-    } else if(isMarket(url)) {
-      if(isInstallApp(intent, context)) return startApp(intent, context);
-      else return startGooglePlay(intent, context);
-    } else if(isSpecialCase(url)) {
-      if(isInstallApp(intent, context)) return startApp(intent, context);
-      else return startGooglePlay(intent, context);
-    }
-//      return url.contains("vguardend");
-    return shouldOverrideUrlLoadingRN(view, url);
-  }
-
-
-  private boolean shouldOverrideUrlLoadingRN(WebView view, String url) {
-
-    final BPCWebView bpcWebView = (BPCWebView) view;
-    final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
-
-    if (!isJsDebugging && bpcWebView.mCatalystInstance != null) {
-      final Pair<Integer, AtomicReference<BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = BPCWebViewModule.shouldOverrideUrlLoadingLock.getNewLock();
-      final int lockIdentifier = lock.first;
-      final AtomicReference<BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
-
-      final WritableMap event = createWebViewEvent(view, url);
-      event.putInt("lockIdentifier", lockIdentifier);
-      bpcWebView.sendDirectMessage("onShouldStartLoadWithRequest", event);
-
-      try {
-        assert lockObject != null;
-        synchronized (lockObject) {
-          final long startTime = SystemClock.elapsedRealtime();
-          while (lockObject.get() == BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.UNDECIDED) {
-            if (SystemClock.elapsedRealtime() - startTime > SHOULD_OVERRIDE_URL_LOADING_TIMEOUT) {
-              FLog.w(TAG, "Did not receive response to shouldOverrideUrlLoading in time, defaulting to allow loading.");
-              BPCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-              return false;
-            }
-            lockObject.wait(SHOULD_OVERRIDE_URL_LOADING_TIMEOUT);
-          }
-        }
-      } catch (InterruptedException e) {
-        FLog.e(TAG, "shouldOverrideUrlLoading was interrupted while waiting for result.", e);
-        BPCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-        return false;
-      }
-
-      final boolean shouldOverride = lockObject.get() == BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.SHOULD_OVERRIDE;
-      BPCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-
-      return shouldOverride;
-    } else {
-      FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
-      progressChangedFilter.setWaitingForCommandLoadUrl(true);
-      ((BPCWebView) view).dispatchEvent(
-        view,
-        new TopShouldStartLoadWithRequestEvent(
-          view.getId(),
-          createWebViewEvent(view, url)));
-      return true;
     }
   }
-
 
   protected Boolean isSpecialCase(String url) {
     return url.matches("^shinhan\\S+$")
@@ -193,6 +87,10 @@ public class BPCWebViewClient extends WebViewClient {
         else if (url.startsWith("nhappvardansimclick")) intent.setPackage("nh.smart.nhallonepay");
         else if (url.startsWith("citispay")) intent.setPackage("kr.co.citibank.citimobile");
         else if (url.startsWith("kakaotalk")) intent.setPackage("com.kakao.talk");
+        else if (url.startsWith("newliiv")) intent.setPackage("com.kbstar.reboot");
+        else if (url.startsWith("kbbank")) intent.setPackage("com.kbstar.kbbank");
+
+
       }
       return intent;
     } catch (URISyntaxException e) {
@@ -262,12 +160,139 @@ public class BPCWebViewClient extends WebViewClient {
     }
     return true;
   }
+  /** bootpay added end ***/
+
+  protected boolean mLastLoadFailed = false;
+  protected @Nullable
+  ReadableArray mUrlPrefixesForDefaultIntent;
+  protected BPCWebView.ProgressChangedFilter progressChangedFilter = null;
+  protected @Nullable String ignoreErrFailedForThisURL = null;
+  protected @Nullable BasicAuthCredential basicAuthCredential = null;
+
+  public void setIgnoreErrFailedForThisURL(@Nullable String url) {
+    ignoreErrFailedForThisURL = url;
+  }
+
+  public void setBasicAuthCredential(@Nullable BasicAuthCredential credential) {
+    basicAuthCredential = credential;
+  }
+
+  /** bootpay changed  **/
+  @Override
+  public void onPageFinished(WebView webView, String url) {
+    super.onPageFinished(webView, url);
+    updateBlindViewIfNaverLogin(webView, url);
+
+    if (!mLastLoadFailed) {
+      BPCWebView reactWebView = (BPCWebView) webView;
+
+      reactWebView.callInjectedJavaScript();
+
+      emitFinishEvent(webView, url);
+    }
+  }
+
+  @Override
+  public void onPageStarted(WebView webView, String url, Bitmap favicon) {
+    super.onPageStarted(webView, url, favicon);
+    mLastLoadFailed = false;
+
+    BPCWebView reactWebView = (BPCWebView) webView;
+    reactWebView.callInjectedJavaScriptBeforeContentLoaded();
+
+    ((BPCWebView) webView).dispatchEvent(
+      webView,
+      new TopLoadingStartEvent(
+        webView.getId(),
+        createWebViewEvent(webView, url)));
+  }
+
+  /** bootpay changed  **/
+
+  @Override
+  public boolean shouldOverrideUrlLoading(WebView view, String url) {
+    Intent intent = getIntentWithPackage(url);
+    Context context = view.getContext();
+
+    Log.d("bootpay", "shouldOverrideUrlLoading : " + url);
+
+    if(isIntent(url)) {
+      if(isInstallApp(intent, context)) return startApp(intent, context);
+      else return startGooglePlay(intent, context);
+    } else if(isMarket(url)) {
+      if(isInstallApp(intent, context)) return startApp(intent, context);
+      else return startGooglePlay(intent, context);
+    } else if(isSpecialCase(url)) {
+      if(isInstallApp(intent, context)) return startApp(intent, context);
+      else return startGooglePlay(intent, context);
+    }
+//      return url.contains("vguardend");
+    return shouldOverrideUrlLoadingRN(view, url);
+  }
+
+
+  private boolean shouldOverrideUrlLoadingRN(WebView view, String url) {
+    final BPCWebView bpcWebView = (BPCWebView) view;
+    final boolean isJsDebugging = ((ReactContext) view.getContext()).getJavaScriptContextHolder().get() == 0;
+
+    if (!isJsDebugging && bpcWebView.mCatalystInstance != null) {
+      final Pair<Integer, AtomicReference<BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState>> lock = BPCWebViewModule.shouldOverrideUrlLoadingLock.getNewLock();
+      final int lockIdentifier = lock.first;
+      final AtomicReference<BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState> lockObject = lock.second;
+
+      final WritableMap event = createWebViewEvent(view, url);
+      event.putInt("lockIdentifier", lockIdentifier);
+      bpcWebView.sendDirectMessage("onShouldStartLoadWithRequest", event);
+
+      try {
+        assert lockObject != null;
+        synchronized (lockObject) {
+          final long startTime = SystemClock.elapsedRealtime();
+          while (lockObject.get() == BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.UNDECIDED) {
+            if (SystemClock.elapsedRealtime() - startTime > SHOULD_OVERRIDE_URL_LOADING_TIMEOUT) {
+              FLog.w(TAG, "Did not receive response to shouldOverrideUrlLoading in time, defaulting to allow loading.");
+              BPCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
+              return false;
+            }
+            lockObject.wait(SHOULD_OVERRIDE_URL_LOADING_TIMEOUT);
+          }
+        }
+      } catch (InterruptedException e) {
+        FLog.e(TAG, "shouldOverrideUrlLoading was interrupted while waiting for result.", e);
+        BPCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
+        return false;
+      }
+
+      final boolean shouldOverride = lockObject.get() == BPCWebViewModule.ShouldOverrideUrlLoadingLock.ShouldOverrideCallbackState.SHOULD_OVERRIDE;
+      BPCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
+
+      return shouldOverride;
+    } else {
+      FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
+      progressChangedFilter.setWaitingForCommandLoadUrl(true);
+      ((BPCWebView) view).dispatchEvent(
+        view,
+        new TopShouldStartLoadWithRequestEvent(
+          view.getId(),
+          createWebViewEvent(view, url)));
+      return true;
+    }
+  }
 
   @TargetApi(Build.VERSION_CODES.N)
   @Override
   public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
     final String url = request.getUrl().toString();
     return this.shouldOverrideUrlLoading(view, url);
+  }
+
+  @Override
+  public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+    if (basicAuthCredential != null) {
+      handler.proceed(basicAuthCredential.username, basicAuthCredential.password);
+      return;
+    }
+    super.onReceivedHttpAuthRequest(view, handler, host, realm);
   }
 
   @Override
@@ -286,7 +311,7 @@ public class BPCWebViewClient extends WebViewClient {
 
     if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
       // If error is not due to top-level navigation, then do not call onReceivedError()
-      Log.w("BPCWebViewManager", "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
+      Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
       return;
     }
 
@@ -395,10 +420,10 @@ public class BPCWebViewClient extends WebViewClient {
     super.onRenderProcessGone(webView, detail);
 
     if(detail.didCrash()){
-      Log.e("BPCWebViewManager", "The WebView rendering process crashed.");
+      Log.e(TAG, "The WebView rendering process crashed.");
     }
     else{
-      Log.w("BPCWebViewManager", "The WebView rendering process was killed by the system.");
+      Log.w(TAG, "The WebView rendering process was killed by the system.");
     }
 
     // if webView is null, we cannot return any event
