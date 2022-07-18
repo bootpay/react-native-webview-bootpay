@@ -1,4 +1,7 @@
 
+## 11.22.8
+* critical bug fixed 
+
 ## 11.22.7
 * react-native-webview 11.22.7 forked 
 * 이존 기능 유지 

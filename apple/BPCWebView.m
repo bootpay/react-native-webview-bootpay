@@ -53,7 +53,7 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 @end
 @implementation BPCWKWebView
 - (void)scrollWheel:(NSEvent *)theEvent {
-  BPCWebView *BPCWebView = (BPCWebView *)[self superview];
+  BPCWebView *rncWebView = (BPCWebView *)[self superview];
   RCTAssert([rncWebView isKindOfClass:[rncWebView class]], @"superview must be an BPCWebView");
   if (![rncWebView scrollEnabled]) {
     [[self nextResponder] scrollWheel:theEvent];
