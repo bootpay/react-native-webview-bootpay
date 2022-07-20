@@ -1,4 +1,7 @@
 
+## 11.22.82
+* change package.json  "main-internal" 
+
 ## 11.22.81
 * critical bug fixed 
 

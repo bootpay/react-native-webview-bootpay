@@ -2,7 +2,7 @@
   "name": "react-native-webview-bootpay",
   "description": "React Native WebView 를 포크떠서 만든 Bootpay WebViewfor iOS, Android, macOS, and Windows",
   "main": "index.js",
-  "main-internal": "src/index.ts",
+  "main-internal": "index.js",
   "typings": "index.d.ts",
   "author": "bootpay <bootpay.co.kr@gmail.com>",
   "contributors": [
