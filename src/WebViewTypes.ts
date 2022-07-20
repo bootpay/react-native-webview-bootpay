@@ -723,7 +723,7 @@ export interface IOSWebViewProps extends WebViewSharedProps {
    * if you require to send message to App , webpage has to explicitly call webkit message handler
    * and receive it on `onMessage` handler on react native side
    * @example
-   *     window.webkit.messageHandlers.ReactNativeWebView.postMessage("hello apple pay")
+   *     window.webkit.messageHandlers.BootpayRNWebView.postMessage("hello apple pay")
    * @platform ios
    * The default value is false.
    */
@@ -1194,10 +1194,10 @@ export interface WebViewSharedProps extends ViewProps {
   onNavigationStateChange?: (event: WebViewNavigation) => void;
 
   /**
-   * Function that is invoked when the webview calls `window.ReactNativeWebView.postMessage`.
+   * Function that is invoked when the webview calls `window.BootpayRNWebView.postMessage`.
    * Setting this property will inject this global into your webview.
    *
-   * `window.ReactNativeWebView.postMessage` accepts one argument, `data`, which will be
+   * `window.BootpayRNWebView.postMessage` accepts one argument, `data`, which will be
    * available on the event object, `event.nativeEvent.data`. `data` must be a string.
    */
   onMessage?: (event: WebViewMessageEvent) => void;

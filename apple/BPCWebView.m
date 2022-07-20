@@ -19,7 +19,9 @@
 
 static NSTimer *keyboardTimer;
 static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
-static NSString *const MessageHandlerName = @"ReactNativeWebView";
+// static NSString *const MessageHandlerName = @"ReactNativeWebView";
+static NSString *const MessageHandlerName = @"BootpayRNWebView";
+
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 

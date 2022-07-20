@@ -1,3 +1,5 @@
+## 11.22.83
+* ios message interface name change to 'BootpayRNWebView'
 
 ## 11.22.82
 * change package.json  "main-internal" 

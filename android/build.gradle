@@ -28,7 +28,7 @@ buildscript {
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ReactNativeWebView_' + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['BootpayRNWebView' + name]).toInteger()
 }
 
 apply plugin: 'com.android.library'
