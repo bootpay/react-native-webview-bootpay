@@ -30,10 +30,10 @@ NSString *const CUSTOM_SELECTOR = @"_CUSTOM_SELECTOR_";
 #if !TARGET_OS_OSX
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
-@interface _SwizzleHelperWK : UIView
+@interface _BPSwizzleHelperWK : UIView
 @property (nonatomic, copy) WKWebView *webView;
 @end
-@implementation _SwizzleHelperWK
+@implementation _BPSwizzleHelperWK
 -(id)inputAccessoryView
 {
   if (_webView == nil) {
@@ -311,10 +311,24 @@ RCTAutoInsetsProtocol>
  */
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
-  if (!navigationAction.targetFrame.isMainFrame) {
-    [webView loadRequest:navigationAction.request];
-  }
-  return nil;
+//  if (!navigationAction.targetFrame.isMainFrame) {
+//    [webView loadRequest:navigationAction.request];
+//  }
+//  return nil;
+    
+    WKWebView *popupView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height) configuration:configuration];
+    
+    [popupView autoresizingMask];
+    popupView.navigationDelegate = self;
+    popupView.UIDelegate = self;
+    
+    [self addSubview:popupView];
+    
+    return popupView;
+}
+
+- (void)webViewDidClose:(WKWebView *)webView {
+    [webView removeFromSuperview];
 }
 
 - (WKWebViewConfiguration *)setUpWkWebViewConfig
@@ -821,7 +835,7 @@ RCTAutoInsetsProtocol>
     newClass = objc_allocateClassPair(subview.class, [name cStringUsingEncoding:NSASCIIStringEncoding], 0);
     if(!newClass) return;
     
-    Method method = class_getInstanceMethod([_SwizzleHelperWK class], @selector(inputAccessoryView));
+    Method method = class_getInstanceMethod([_BPSwizzleHelperWK class], @selector(inputAccessoryView));
     class_addMethod(newClass, @selector(inputAccessoryView), method_getImplementation(method), method_getTypeEncoding(method));
     
     objc_registerClassPair(newClass);
@@ -999,7 +1013,7 @@ RCTAutoInsetsProtocol>
 {
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+  [alert addAction:[UIAlertAction actionWithTitle:@"확인" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
     completionHandler();
   }]];
   [[self topViewController] presentViewController:alert animated:YES completion:NULL];
@@ -1018,18 +1032,18 @@ RCTAutoInsetsProtocol>
 - (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL))completionHandler{
 #if !TARGET_OS_OSX
   UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:message preferredStyle:UIAlertControllerStyleAlert];
-  [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+  [alert addAction:[UIAlertAction actionWithTitle:@"확인" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
     completionHandler(YES);
   }]];
-  [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+  [alert addAction:[UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
     completionHandler(NO);
   }]];
   [[self topViewController] presentViewController:alert animated:YES completion:NULL];
 #else
   NSAlert *alert = [[NSAlert alloc] init];
   [alert setMessageText:message];
-  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"OK button")];
-  [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button")];
+  [alert addButtonWithTitle:NSLocalizedString(@"확인", @"OK button")];
+  [alert addButtonWithTitle:NSLocalizedString(@"취소", @"Cancel button")];
   void (^callbacksHandlers)(NSModalResponse response) = ^void(NSModalResponse response) {
     completionHandler(response == NSAlertFirstButtonReturn);
   };
@@ -1046,11 +1060,11 @@ RCTAutoInsetsProtocol>
   [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
     textField.text = defaultText;
   }];
-  UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+  UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"확인" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
     completionHandler([[alert.textFields lastObject] text]);
   }];
   [alert addAction:okAction];
-  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+  UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"취소" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
     completionHandler(nil);
   }];
   [alert addAction:cancelAction];
@@ -1069,8 +1083,8 @@ RCTAutoInsetsProtocol>
   textField.stringValue = defaultText;
   [alert setAccessoryView:textField];
   
-  [alert addButtonWithTitle:NSLocalizedString(@"OK", @"OK button")];
-  [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button")];
+  [alert addButtonWithTitle:NSLocalizedString(@"확인", @"OK button")];
+  [alert addButtonWithTitle:NSLocalizedString(@"취소", @"Cancel button")];
   [alert beginSheetModalForWindow:[NSApp keyWindow] completionHandler:^(NSModalResponse response) {
     if (response == NSAlertFirstButtonReturn) {
       completionHandler([textField stringValue]);
@@ -1117,11 +1131,37 @@ RCTAutoInsetsProtocol>
 
 #endif // !TARGET_OS_OSX
 
+
+
+- (void)                  webView:(WKWebView *)webView
+ decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
+                 decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
+{
+    NSString *url = navigationAction.request.URL.absoluteString;
+     
+    _beforeUrl = url;
+    
+//    [self updateBlindViewIfNaverLogin:url];
+    
+    if([self isItunesURL:url]) {
+        [self startAppToApp:[NSURL URLWithString:url]];
+        decisionHandler(WKNavigationActionPolicyCancel);
+    } else if([url hasPrefix:@"about:blank"]) {
+        decisionHandler(WKNavigationActionPolicyAllow);
+    } else if(![url hasPrefix:@"http"]) {
+        [self startAppToApp:[NSURL URLWithString:url]];
+        decisionHandler(WKNavigationActionPolicyCancel);
+    } else {
+        decisionHandler(WKNavigationActionPolicyAllow);
+    }
+}
+
+
 /**
  * Decides whether to allow or cancel a navigation.
  * @see https://fburl.com/42r9fxob
  */
-- (void)                  webView:(WKWebView *)webView
+- (void)                  webViewRN:(WKWebView *)webView
   decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
                   decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
@@ -1641,6 +1681,138 @@ didFinishNavigation:(WKNavigation *)navigation
     }
   }
   return request;
+}
+
+
+#pragma mark - WebVoew Javascript
+
+-(void) doJavascript:(NSString*) script {
+    [_webView evaluateJavaScript:script completionHandler:nil];
+}
+
+- (void) loadUrl:(NSString*) urlString {
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
+    [_webView loadRequest:request];
+}
+
+- (void) naverLoginBugFix {
+    if([_beforeUrl hasPrefix:@"naversearchthirdlogin://"]) {
+        NSString* value = [self getQueryStringParameter:_beforeUrl :@"session"];
+        if(value != nil && [value length] > 0) {
+            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://nid.naver.com/login/scheme.redirect?session=%@", value]];
+            NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
+            [_webView loadRequest:request];
+        }
+    }
+}
+
+- (NSString*) getQueryStringParameter:(NSString*)url :(NSString*)param {
+    NSMutableDictionary *queryStringDictionary = [[NSMutableDictionary alloc] init];
+    NSArray *urlComponents = [url componentsSeparatedByString:@"&"];
+    
+    for (NSString *keyValuePair in urlComponents)
+    {
+        NSArray *pairComponents = [keyValuePair componentsSeparatedByString:@"="];
+        NSString *key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
+        NSString *value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
+
+        if([param isEqualToString:key]) {
+            return value;
+        }
+    }
+    
+    return @"";
+}
+
+- (void) startAppToApp:(NSURL*) url {
+    UIApplication *application = [UIApplication sharedApplication];
+    
+    if (@available(iOS 10.0, *)) {
+        [application openURL:url options:@{} completionHandler: ^(BOOL success) {
+            if(success == false) {
+                [self startItunesToInstall:url];
+            }
+        }];
+    } else {
+        [application openURL:url];
+    }
+}
+
+
+- (void) startItunesToInstall:(NSURL*) url {
+    NSString *sUrl = url.absoluteString;
+    NSString *itunesUrl = @"";
+    
+    if([sUrl hasPrefix: @"kfc-bankpay"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%B1%85%ED%81%AC%ED%8E%98%EC%9D%B4-%EA%B8%88%EC%9C%B5%EA%B8%B0%EA%B4%80-%EA%B3%B5%EB%8F%99-%EA%B3%84%EC%A2%8C%EC%9D%B4%EC%B2%B4-%EA%B2%B0%EC%A0%9C-%EC%A0%9C%EB%A1%9C%ED%8E%98%EC%9D%B4/id398456030";
+    } else if([sUrl hasPrefix: @"ispmobile"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/isp/id369125087";
+    } else if([sUrl hasPrefix: @"hdcardappcardansimclick"] || [sUrl hasPrefix: @"smhyundaiansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%ED%98%84%EB%8C%80%EC%B9%B4%EB%93%9C/id702653088";
+    } else if([sUrl hasPrefix: @"shinhan-sr-ansimclick"] || [sUrl hasPrefix: @"smshinhanansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%8B%A0%ED%95%9C%ED%8E%98%EC%9D%B4%ED%8C%90/id572462317";
+    } else if([sUrl hasPrefix: @"kb-acp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/kb-pay/id695436326";
+    } else if([sUrl hasPrefix: @"liivbank"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%A6%AC%EB%B8%8C/id1126232922";
+    } else if([sUrl hasPrefix: @"mpocket.online.ansimclick"] || [sUrl hasPrefix: @"ansimclickscard"] || [sUrl hasPrefix: @"ansimclickipcollect"] || [sUrl hasPrefix: @"samsungpay"] || [sUrl hasPrefix: @"scardcertiapp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%82%BC%EC%84%B1%EC%B9%B4%EB%93%9C/id535125356";
+    } else if([sUrl hasPrefix: @"lottesmartpay"]) {
+        itunesUrl = @"https://apps.apple.com/us/app/%EB%A1%AF%EB%8D%B0%EC%B9%B4%EB%93%9C-%EC%95%B1%EC%B9%B4%EB%93%9C/id688047200";
+    } else if([sUrl hasPrefix: @"lotteappcard"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%94%94%EC%A7%80%EB%A1%9C%EC%B9%B4-%EB%A1%AF%EB%8D%B0%EC%B9%B4%EB%93%9C/id688047200";
+    } else if([sUrl hasPrefix: @"newsmartpib"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%9A%B0%EB%A6%AC-won-%EB%B1%85%ED%82%B9/id1470181651";
+    } else if([sUrl hasPrefix: @"com.wooricard.wcard"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%9A%B0%EB%A6%ACwon%EC%B9%B4%EB%93%9C/id1499598869";
+    } else if([sUrl hasPrefix: @"citispay"] || [sUrl hasPrefix: @"citicardappkr"] || [sUrl hasPrefix: @"citimobileapp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%94%A8%ED%8B%B0%EB%AA%A8%EB%B0%94%EC%9D%BC/id1179759666";
+    } else if([sUrl hasPrefix: @"shinsegaeeasypayment"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/ssgpay/id666237916";
+    } else if([sUrl hasPrefix: @"cloudpay"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%ED%95%98%EB%82%98%EC%B9%B4%EB%93%9C-%EC%9B%90%ED%81%90%ED%8E%98%EC%9D%B4/id847268987";
+    } else if([sUrl hasPrefix: @"hanawalletmembers"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/n-wallet/id492190784";
+    } else if([sUrl hasPrefix: @"nhappvardansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%98%AC%EC%9B%90%ED%8E%98%EC%9D%B4-nh%EC%95%B1%EC%B9%B4%EB%93%9C/id1177889176";
+    } else if([sUrl hasPrefix: @"nhallonepayansimclick"] || [sUrl hasPrefix: @"nhappcardansimclick"] || [sUrl hasPrefix: @"nhallonepayansimclick"] || [sUrl hasPrefix: @"nonghyupcardansimclick"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%98%AC%EC%9B%90%ED%8E%98%EC%9D%B4-nh%EC%95%B1%EC%B9%B4%EB%93%9C/id1177889176";
+    } else if([sUrl hasPrefix: @"payco"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/payco/id924292102";
+    } else if([sUrl hasPrefix: @"lpayapp"] || [sUrl hasPrefix: @"lmslpay"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/l-point-with-l-pay/id473250588";
+    } else if([sUrl hasPrefix: @"naversearchapp"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958";
+    } else if([sUrl hasPrefix: @"tauthlink"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/pass-by-skt/id1141258007";
+    } else if([sUrl hasPrefix: @"uplusauth"] || [sUrl hasPrefix: @"upluscorporation"] ) {
+        itunesUrl = @"https://apps.apple.com/kr/app/pass-by-u/id1147394645";
+    } else if([sUrl hasPrefix: @"ktauthexternalcall"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/pass-by-kt/id1134371550";
+    } else if([sUrl hasPrefix: @"supertoss"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328";
+    } else if([sUrl hasPrefix: @"kakaotalk"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/kakaotalk/id362057947";
+    } else if([sUrl hasPrefix: @"chaipayment"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/%EC%B0%A8%EC%9D%B4/id1459979272";
+    } else if([sUrl hasPrefix: @"ukbanksmartbanknonloginpay"]) {
+        itunesUrl = @"https://itunes.apple.com/kr/developer/%EC%BC%80%EC%9D%B4%EB%B1%85%ED%81%AC/id1178872626?mt=8";
+    } else if([sUrl hasPrefix: @"newliiv"]) {
+        itunesUrl = @"https://apps.apple.com/us/app/%EB%A6%AC%EB%B8%8C-next/id1573528126";
+    } else if([sUrl hasPrefix: @"kbbank"]) {
+        itunesUrl = @"https://apps.apple.com/kr/app/kb%EC%8A%A4%ED%83%80%EB%B1%85%ED%82%B9/id373742138";
+    }
+    
+    if(itunesUrl.length > 0) {
+        NSURL *appstore = [NSURL URLWithString: itunesUrl];
+        [self startAppToApp: appstore];
+    }
+}
+
+- (BOOL) isItunesURL:(NSString*) urlString {
+    NSRange match = [urlString rangeOfString: @"itunes.apple.com"];
+    return match.location != NSNotFound;
 }
 
 @end

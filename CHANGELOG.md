@@ -1,3 +1,6 @@
+## 11.22.84
+* ios deep link 처리 되도록 수정 
+
 ## 11.22.83
 * ios message interface name change to 'BootpayRNWebView'
 

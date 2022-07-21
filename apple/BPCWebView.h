@@ -37,6 +37,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 
 @interface BPCWebView : RCTView
 
+@property NSString* beforeUrl;
 @property (nonatomic, weak) id<BPCWebViewDelegate> _Nullable delegate;
 @property (nonatomic, copy) NSDictionary * _Nullable source;
 @property (nonatomic, assign) BOOL messagingEnabled;
@@ -114,5 +115,17 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *_Nonnull)request
 - (void)addPullToRefreshControl;
 - (void)pullToRefresh:(UIRefreshControl *_Nonnull)refreshControl;
 #endif
+
+- (void)                  webViewRN:(WKWebView *)webView
+  decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
+                    decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler;
+
+- (void) doJavascript:(NSString*) script;
+- (void) loadUrl:(NSString*) urlString;
+- (void) naverLoginBugFix;
+- (NSString*) getQueryStringParameter:(NSString*)url :(NSString*)param;
+- (void) startAppToApp:(NSURL*) url;
+- (void) startItunesToInstall:(NSURL*) url;
+- (BOOL) isItunesURL:(NSString*) urlString;
 
 @end
