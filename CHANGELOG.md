@@ -1,3 +1,6 @@
+## 11.22.85
+* change autolink path
+
 ## 11.22.84
 * ios deep link 처리 되도록 수정 
 
