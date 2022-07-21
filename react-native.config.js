@@ -31,7 +31,7 @@ const project = (() => {
 module.exports = {
   dependencies: {
     // Help rn-cli find and autolink this library
-    'react-native-webview': {
+    'react-native-webview-bootpay': {
       root: __dirname,
     },
   },
