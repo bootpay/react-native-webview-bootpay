@@ -23,7 +23,7 @@ static NSString *const MessageHandlerName = @"BootpayRNWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
 
-NSString *const CUSTOM_SELECTOR = @"_BPCUSTOM_SELECTOR_";
+NSString *const BPCUSTOM_SELECTOR = @"_BPCUSTOM_SELECTOR_";
 
 #if !TARGET_OS_OSX
 // runtime trick to remove WKWebView keyboard default toolbar
@@ -258,7 +258,7 @@ RCTAutoInsetsProtocol>
     for(NSDictionary *menuItem in self.menuItems) {
       NSString *menuItemLabel = [RCTConvert NSString:menuItem[@"label"]];
       NSString *menuItemKey = [RCTConvert NSString:menuItem[@"key"]];
-      NSString *sel = [NSString stringWithFormat:@"%@%@", CUSTOM_SELECTOR, menuItemKey];
+      NSString *sel = [NSString stringWithFormat:@"%@%@", BPCUSTOM_SELECTOR, menuItemKey];
       UIMenuItem *item = [[UIMenuItem alloc] initWithTitle: menuItemLabel
                                                     action: NSSelectorFromString(sel)];
       [menuControllerItems addObject: item];
@@ -319,7 +319,7 @@ RCTAutoInsetsProtocol>
 - (void)forwardInvocation:(NSInvocation *)invocation
 {
   NSString *sel = NSStringFromSelector([invocation selector]);
-  NSRange match = [sel rangeOfString:CUSTOM_SELECTOR];
+  NSRange match = [sel rangeOfString:BPCUSTOM_SELECTOR];
   if (match.location == 0) {
     [self tappedMenuItem:[sel substringFromIndex:17]];
   } else {
@@ -338,7 +338,7 @@ RCTAutoInsetsProtocol>
 {
   NSString *sel = NSStringFromSelector(action);
   // Do any of them have our custom keys?
-  NSRange match = [sel rangeOfString:CUSTOM_SELECTOR];
+  NSRange match = [sel rangeOfString:BPCUSTOM_SELECTOR];
 
   if (match.location == 0) {
     return YES;
