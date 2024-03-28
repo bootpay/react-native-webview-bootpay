@@ -34,6 +34,12 @@ import kr.co.bootpay.webview.events.TopShouldStartLoadWithRequestEvent;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.widget.Toast;
+
 public class BPCWebViewClient extends WebViewClient {
     private static String TAG = "BPCWebViewClient";
     protected static final int SHOULD_OVERRIDE_URL_LOADING_TIMEOUT = 250;
@@ -213,6 +219,37 @@ public class BPCWebViewClient extends WebViewClient {
                 description,
                 failingUrl
         );
+        alertSSLError(webView, handler, error);
+    }
+
+    void alertSSLError(WebView view, SslErrorHandler handler, SslError error) {
+      // for SSLErrorHandler
+      AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+      builder.setTitle("SSL Connection Error");
+      builder.setMessage("Your device's Android version is outdated and may not securely connect to our service. To continue using the app securely, please update your device's operating system. If you choose to proceed without updating, it may expose you to security vulnerabilities.");
+      builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          // Redirect the user to the system update settings
+
+
+          Intent intent = new Intent("android.settings.SYSTEM_UPDATE_SETTINGS");
+          if (intent.resolveActivity(view.getContext().getPackageManager()) != null) {
+            view.getContext().startActivity(intent);
+          } else {
+            // If the device does not support system update settings intent
+            Toast.makeText(view.getContext(), "System update option not available. Please check your device settings manually.", Toast.LENGTH_LONG).show();
+          }
+        }
+      });
+      builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          handler.cancel();
+        }
+      });
+      AlertDialog dialog = builder.create();
+      dialog.show();
     }
 
     @Override
