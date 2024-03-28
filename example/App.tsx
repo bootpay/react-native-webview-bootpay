@@ -17,8 +17,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <WebView
         source={{ 
-          uri: 'https://dpost.co.kr/signin',  
-          // uri: 'https://dev-js.bootapi.com/test/payment/'
+          uri: 'https://reactnative.dev/'
         }}
         startInLoadingState={true}
         scalesPageToFit={true}

@@ -74,10 +74,10 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
                     .navigationType = stringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .isTopFrame = [[dictionary valueForKey:@"isTopFrame"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .isTopFrame = static_cast<bool>([[dictionary valueForKey:@"isTopFrame"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
                     .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String])
                 };
                 webViewEventEmitter->onShouldStartLoadWithRequest(data);
@@ -91,9 +91,9 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
                     .navigationType = stringToOnLoadingStartNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
                     .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String], [[dictionary valueForKey:@"mainDocumentURL"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
                 };
                 webViewEventEmitter->onLoadingStart(data);
@@ -108,9 +108,9 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
                     .code = [[dictionary valueForKey:@"code"] intValue],
                     .description = std::string([[dictionary valueForKey:@"description"] UTF8String]),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
                     .domain = std::string([[dictionary valueForKey:@"domain"] UTF8String])
                 };
                 webViewEventEmitter->onLoadingError(data);
@@ -123,9 +123,9 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
                     .data = std::string([[dictionary valueForKey:@"data"] UTF8String])
                 };
                 webViewEventEmitter->onMessage(data);
@@ -139,9 +139,9 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
                     .navigationType = stringToOnLoadingFinishNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String], [[dictionary valueForKey:@"navigationType"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
                     .mainDocumentURL = std::string([[dictionary valueForKey:@"mainDocumentURL"] UTF8String], [[dictionary valueForKey:@"mainDocumentURL"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])
                 };
                 webViewEventEmitter->onLoadingFinish(data);
@@ -154,9 +154,9 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue],
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
                     .progress = [[dictionary valueForKey:@"progress"] doubleValue]
                 };
                 webViewEventEmitter->onLoadingProgress(data);
@@ -169,9 +169,9 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue]
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue])
                 };
                 webViewEventEmitter->onContentProcessDidTerminate(data);
             }
@@ -229,9 +229,9 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
                     .statusCode = [[dictionary valueForKey:@"statusCode"] intValue],
                     .description = std::string([[dictionary valueForKey:@"description"] UTF8String]),
-                    .canGoBack = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .canGoForward = [[dictionary valueForKey:@"canGoBack"] boolValue],
-                    .loading = [[dictionary valueForKey:@"loading"] boolValue]
+                    .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
+                    .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue])
                 };
                 webViewEventEmitter->onHttpError(data);
             }
@@ -266,6 +266,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptBeforeContentLoaded)
     REMAP_WEBVIEW_PROP(injectedJavaScriptForMainFrameOnly)
     REMAP_WEBVIEW_PROP(injectedJavaScriptBeforeContentLoadedForMainFrameOnly)
+    REMAP_WEBVIEW_STRING_PROP(injectedJavaScriptObject)
     REMAP_WEBVIEW_PROP(javaScriptEnabled)
     REMAP_WEBVIEW_PROP(javaScriptCanOpenWindowsAutomatically)
     REMAP_WEBVIEW_PROP(allowFileAccessFromFileURLs)
@@ -284,9 +285,10 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     REMAP_WEBVIEW_PROP(cacheEnabled)
     REMAP_WEBVIEW_PROP(allowsLinkPreview)
     REMAP_WEBVIEW_STRING_PROP(allowingReadAccessToURL)
-    
     REMAP_WEBVIEW_PROP(messagingEnabled)
+    #if !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(fraudulentWebsiteWarningEnabled)
+    #endif // !TARGET_OS_OSX
     REMAP_WEBVIEW_PROP(enableApplePay)
     REMAP_WEBVIEW_PROP(pullToRefreshEnabled)
     REMAP_WEBVIEW_PROP(bounces)
@@ -310,7 +312,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
 #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 140500 /* iOS 14.5 */
     REMAP_WEBVIEW_PROP(textInteractionEnabled)
 #endif
-    
+
+#if !TARGET_OS_OSX
     if (oldViewProps.dataDetectorTypes != newViewProps.dataDetectorTypes) {
         WKDataDetectorTypes dataDetectorTypes = WKDataDetectorTypeNone;
             if (dataDetectorTypes & BPCWebViewDataDetectorTypes::Address) {
@@ -334,6 +337,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
         }
         [_view setDataDetectorTypes:dataDetectorTypes];
     }
+#endif // !TARGET_OS_OSX
+
     if (oldViewProps.contentInset.top != newViewProps.contentInset.top || oldViewProps.contentInset.left != newViewProps.contentInset.left || oldViewProps.contentInset.right != newViewProps.contentInset.right || oldViewProps.contentInset.bottom != newViewProps.contentInset.bottom) {
         UIEdgeInsets edgesInsets = {
             .top = newViewProps.contentInset.top,
@@ -350,6 +355,8 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             @"password": RCTNSStringFromString(newViewProps.basicAuthCredential.password)
         }];
     }
+
+#if !TARGET_OS_OSX
     if (oldViewProps.contentInsetAdjustmentBehavior != newViewProps.contentInsetAdjustmentBehavior) {
         if (newViewProps.contentInsetAdjustmentBehavior == BPCWebViewContentInsetAdjustmentBehavior::Never) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
@@ -361,6 +368,7 @@ auto stringToOnLoadingFinishNavigationTypeEnum(std::string value) {
             [_view setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentAlways];
         }
     }
+#endif // !TARGET_OS_OSX
 
     if (oldViewProps.menuItems != newViewProps.menuItems) {
         NSMutableArray *newMenuItems = [NSMutableArray array];
@@ -526,3 +534,4 @@ Class<RCTComponentViewProtocol> BPCWebViewCls(void)
 
 @end
 #endif
+

@@ -3,11 +3,14 @@ package kr.co.bootpay.webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.net.http.SslError;
 import android.os.Build;
 import android.os.Message;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -15,11 +18,17 @@ import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.PermissionRequest;
+import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.annotation.SuppressLint;
+import android.net.http.SslError;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -44,6 +53,10 @@ import java.util.List;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class BPCWebChromeClient extends WebChromeClient implements LifecycleEventListener {
     protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
@@ -231,15 +244,15 @@ public class BPCWebChromeClient extends WebChromeClient implements LifecycleEven
         if (progressChangedFilter.isWaitingForCommandLoadUrl()) {
             return;
         }
+        int reactTag = BPCWebViewWrapper.getReactTagFromWebView(webView);
         WritableMap event = Arguments.createMap();
-        event.putDouble("target", webView.getId());
+        event.putDouble("target", reactTag);
         event.putString("title", webView.getTitle());
         event.putString("url", url);
         event.putBoolean("canGoBack", webView.canGoBack());
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float) newProgress / 100);
 
-        int reactTag = webView.getId();
         UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
     }
 
@@ -265,7 +278,7 @@ public class BPCWebChromeClient extends WebChromeClient implements LifecycleEven
                    *
                    * Try to ask user to grant permission using Activity.requestPermissions
                    *
-                   * Find more details here: https://github.com/react-native-webview-bootpay/react-native-webview-bootpay/pull/2732
+                   * Find more details here: https://github.com/react-native-webview/react-native-webview/pull/2732
                    */
                   androidPermission = PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID;
                 }            }
