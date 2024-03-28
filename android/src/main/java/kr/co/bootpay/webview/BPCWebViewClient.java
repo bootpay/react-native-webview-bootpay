@@ -170,11 +170,11 @@ public class BPCWebViewClient extends WebViewClient {
         // Undesired behavior: Return value of WebView.getUrl() may be the current URL instead of the failing URL.
         handler.cancel();
 
-        if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
-            // If error is not due to top-level navigation, then do not call onReceivedError()
-            Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
-            return;
-        }
+        // if (!topWindowUrl.equalsIgnoreCase(failingUrl)) {
+        //     // If error is not due to top-level navigation, then do not call onReceivedError()
+        //     Log.w(TAG, "Resource blocked from loading due to SSL error. Blocked URL: "+failingUrl);
+        //     return;
+        // }
 
         int code = error.getPrimaryError();
         String description = "";

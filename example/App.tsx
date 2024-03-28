@@ -17,11 +17,18 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <WebView
         source={{ 
-          uri: 'https://reactnative.dev/'
+          // uri: 'https://reactnative.dev/'
+          uri: 'https://dev-js.bootapi.com/test/payment'
         }}
         startInLoadingState={true}
         scalesPageToFit={true}
-        style={styles.webview} 
+        style={styles.webview}
+        onError={error => {
+          console.log(error)
+        }} 
+        onMessage={message => {
+          console.log(message)
+        }} 
 
         onShouldStartLoadWithRequest={(event) => { 
 

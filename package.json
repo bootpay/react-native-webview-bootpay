@@ -11,7 +11,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "13.8.2",
+  "version": "13.8.3",
   "homepage": "https://github.com/bootpay/react-native-webview-bootpay",
   "scripts": {
     "android": "react-native run-android",
