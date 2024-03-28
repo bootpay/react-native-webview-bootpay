@@ -1,3 +1,7 @@
+### 13.8.2
+- webview version update
+- npm install, react-native run-android 
+
 ### 13.6.13
 - import error fixed
 
