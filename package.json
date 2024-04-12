@@ -11,7 +11,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "13.8.4",
+  "version": "13.8.41",
   "homepage": "https://github.com/bootpay/react-native-webview-bootpay",
   "scripts": {
     "android": "react-native run-android",
@@ -28,7 +28,6 @@
     "test:windows": "yarn jest --setupFiles=./jest-setups/jest.setup.js",
     "add:macos": "yarn add react-native-macos@0.73.17"
   },
-
   "rn-docs": {
     "title": "Webview",
     "type": "Component"
@@ -89,11 +88,6 @@
     "react-native-webview-bootpay.podspec",
     "react-native.config.js"
   ],
-  "resolutions": {
-    "@react-native-community/cli": "10.2.4",
-    "@react-native-community/cli-platform-android": "10.2.0",
-    "@react-native-community/cli-platform-ios": "10.2.4"
-  },
   "codegenConfig": {
     "name": "BPCWebViewSpec",
     "type": "all",

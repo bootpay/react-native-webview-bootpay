@@ -19,7 +19,6 @@ const project = (() => {
       },
     });
   } catch (e) {
-    console.log('Hello?', e);
     return undefined;
   }
 })();
