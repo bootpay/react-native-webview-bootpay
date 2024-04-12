@@ -1,3 +1,6 @@
+### 13.8.1
+- ios compile error bug fixed
+
 ### 13.8.4
 - ssl error 발생시 안드로이드는 소프트업데이트로 안내
 
