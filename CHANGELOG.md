@@ -1,4 +1,7 @@
-### 13.8.1
+### 13.8.42
+- android 설치된 app 못찾는 문제 해결 
+
+### 13.8.41
 - ios compile error bug fixed
 
 ### 13.8.4

@@ -1,6 +1,6 @@
 import React, { useRef }  from 'react';
 
-import WebView from 'react-native-webview-bootpay';
+import { WebView } from 'react-native-webview-bootpay';
 
 import {
   SafeAreaView,
@@ -17,7 +17,7 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <WebView
         source={{ 
-          uri: 'https://reactnative.dev/' 
+          uri: 'https://dev-js.bootapi.com/test/payment/' 
         }}
         startInLoadingState={true}
         scalesPageToFit={true}
@@ -31,6 +31,8 @@ export default function App() {
 
         onShouldStartLoadWithRequest={(event) => { 
 
+          console.log('event.url : ' + event.url);
+
           if(event.url.includes("smartstore.naver")){
             Linking.openURL(event.url);
             return false;
@@ -38,6 +40,7 @@ export default function App() {
            return true;
                                               
         }}
+        
 
 
       /> 

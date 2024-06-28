@@ -39,6 +39,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.widget.Toast;
+import android.util.Log;
 
 public class BPCWebViewClient extends WebViewClient {
     private static String TAG = "BPCWebViewClient";
@@ -60,6 +61,9 @@ public class BPCWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView webView, String url) {
         super.onPageFinished(webView, url);
+
+        
+        Log.d("bootpay url finish", url);
 
         if (!mLastLoadFailed) {
             BPCWebView reactWebView = (BPCWebView) webView;
@@ -92,6 +96,8 @@ public class BPCWebViewClient extends WebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        Log.d("bootpay url", url);
+
       if(BootpayUrlHelper.shouldOverrideUrlLoading(view, url)) {
         return true;
       }

@@ -49,6 +49,7 @@ import kr.co.bootpay.webview.events.TopOpenWindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import android.util.Log;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -123,6 +124,7 @@ public class BPCWebChromeClient extends WebChromeClient implements LifecycleEven
         @Override
         public boolean shouldOverrideUrlLoading (WebView subview, String url) {
 
+            Log.d("bootpay url", url);
 
             // return true;
             if(BootpayUrlHelper.shouldOverrideUrlLoading(view, url)) {
@@ -175,7 +177,7 @@ public class BPCWebChromeClient extends WebChromeClient implements LifecycleEven
 
 
     void setWebSettingCopy(WebView view, WebView newWebView) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
         newWebView.getSettings().setMediaPlaybackRequiresUserGesture( view.getSettings().getMediaPlaybackRequiresUserGesture() );
         }
 

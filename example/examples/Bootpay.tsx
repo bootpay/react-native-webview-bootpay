@@ -17,9 +17,9 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <WebView
         source={{
-          // uri: 'https://camfit.co.kr/products/63c4bd0f393fe0001e5b820d',
+          uri: 'https://camfit.co.kr/products/63c4bd0f393fe0001e5b820d',
           // uri: 'https://dev-js.bootapi.com/test/payment/',
-          uri: 'https://dev-js.bootapi.com/test/payment/',
+          // uri: 'https://dev-js.bootapi.com/test/payment/',
           
           // uri: 'https://d-cdn.bootapi.com/test/payment/',
           
@@ -40,7 +40,8 @@ export default function App() {
            }
           
            return true;
-                                              }}
+                                              
+          }}
 
 
       /> 
