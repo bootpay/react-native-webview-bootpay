@@ -28,10 +28,10 @@ NSString *const BPCUSTOM_SELECTOR = @"_BPCUSTOM_SELECTOR_";
 #if TARGET_OS_IOS
 // runtime trick to remove WKWebView keyboard default toolbar
 // see: http://stackoverflow.com/questions/19033292/ios-7-uiwebview-keyboard-issue/19042279#19042279
-@interface _SwizzleHelperWK : UIView
+@interface _BPSwizzleHelperWK : UIView
 @property (nonatomic, copy) WKWebView *webView;
 @end
-@implementation _SwizzleHelperWK
+@implementation _BPSwizzleHelperWK
 -(id)inputAccessoryView
 {
   if (_webView == nil) {
@@ -48,13 +48,13 @@ NSString *const BPCUSTOM_SELECTOR = @"_BPCUSTOM_SELECTOR_";
 @end
 #endif // TARGET_OS_IOS
 
-@interface RNCWKWebView : WKWebView
+@interface BPCWKWebView : WKWebView
 #if !TARGET_OS_OSX
 @property (nonatomic, copy) NSArray<NSDictionary *> * _Nullable menuItems;
 @property (nonatomic, copy) NSArray<NSString *> * _Nullable suppressMenuItems;
 #endif // !TARGET_OS_OSX
 @end
-@implementation RNCWKWebView
+@implementation BPCWKWebView
 #if !TARGET_OS_OSX
 - (NSString *)stringFromAction:(SEL) action {
   NSString *sel = NSStringFromSelector(action);
@@ -121,7 +121,7 @@ UIGestureRecognizerDelegate,
 #endif // !TARGET_OS_OSX
 RCTAutoInsetsProtocol>
 
-@property (nonatomic, copy) RNCWKWebView *webView;
+@property (nonatomic, copy) BPCWKWebView *webView;
 @property (nonatomic, strong) WKUserScript *postMessageScript;
 @property (nonatomic, strong) WKUserScript *injectedObjectJsonScript;
 @property (nonatomic, strong) WKUserScript *atStartScript;
@@ -512,7 +512,7 @@ RCTAutoInsetsProtocol>
 #endif
 
   // Shim the HTML5 history API:
-  [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+  [wkWebViewConfig.userContentController addScriptMessageHandler:[[BPCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                             name:HistoryShimName];
   [self resetupScripts:wkWebViewConfig];
 
@@ -540,7 +540,7 @@ RCTAutoInsetsProtocol>
 {
   if (self.window != nil && _webView == nil) {
     WKWebViewConfiguration *wkWebViewConfig = [self setUpWkWebViewConfig];
-    _webView = [[RNCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
+    _webView = [[BPCWKWebView alloc] initWithFrame:self.bounds configuration: wkWebViewConfig];
     [self setBackgroundColor: _savedBackgroundColor];
 #if !TARGET_OS_OSX
     _webView.menuItems = _menuItems;
@@ -1003,7 +1003,7 @@ RCTAutoInsetsProtocol>
 
   if(subview == nil) return;
 
-  NSString* name = [NSString stringWithFormat:@"%@_SwizzleHelperWK", subview.class.superclass];
+  NSString* name = [NSString stringWithFormat:@"%@_BPSwizzleHelperWK", subview.class.superclass];
   Class newClass = NSClassFromString(name);
 
   if(newClass == nil)
@@ -1011,7 +1011,7 @@ RCTAutoInsetsProtocol>
     newClass = objc_allocateClassPair(subview.class, [name cStringUsingEncoding:NSASCIIStringEncoding], 0);
     if(!newClass) return;
 
-    Method method = class_getInstanceMethod([_SwizzleHelperWK class], @selector(inputAccessoryView));
+    Method method = class_getInstanceMethod([_BPSwizzleHelperWK class], @selector(inputAccessoryView));
     class_addMethod(newClass, @selector(inputAccessoryView), method_getImplementation(method), method_getTypeEncoding(method));
 
     objc_registerClassPair(newClass);
@@ -1025,7 +1025,7 @@ RCTAutoInsetsProtocol>
   UIView* subview;
 
   for (UIView* view in _webView.scrollView.subviews) {
-    if([[view.class description] hasSuffix:@"_SwizzleHelperWK"])
+    if([[view.class description] hasSuffix:@"_BPSwizzleHelperWK"])
       subview = view;
   }
 
@@ -1854,7 +1854,7 @@ didFinishNavigation:(WKNavigation *)navigation
   [wkWebViewConfig.userContentController removeScriptMessageHandlerForName:MessageHandlerName];
   if(self.enableApplePay){
     if (self.postMessageScript){
-      [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+      [wkWebViewConfig.userContentController addScriptMessageHandler:[[BPCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                                 name:MessageHandlerName];
     }
     return;
@@ -1945,7 +1945,7 @@ didFinishNavigation:(WKNavigation *)navigation
 
   if(_messagingEnabled){
     if (self.postMessageScript){
-      [wkWebViewConfig.userContentController addScriptMessageHandler:[[RNCWeakScriptMessageDelegate alloc] initWithDelegate:self]
+      [wkWebViewConfig.userContentController addScriptMessageHandler:[[BPCWeakScriptMessageDelegate alloc] initWithDelegate:self]
                                                                 name:MessageHandlerName];
       [wkWebViewConfig.userContentController addUserScript:self.postMessageScript];
     }
@@ -2115,7 +2115,7 @@ didFinishNavigation:(WKNavigation *)navigation
 
 @end
 
-@implementation RNCWeakScriptMessageDelegate
+@implementation BPCWeakScriptMessageDelegate
 
 - (instancetype)initWithDelegate:(id<WKScriptMessageHandler>)scriptDelegate {
   self = [super init];

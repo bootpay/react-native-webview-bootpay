@@ -36,7 +36,7 @@ shouldStartLoadForRequest:(NSMutableDictionary<NSString *, id> *)request
 
 @end
 
-@interface RNCWeakScriptMessageDelegate : NSObject<WKScriptMessageHandler>
+@interface BPCWeakScriptMessageDelegate : NSObject<WKScriptMessageHandler>
 
 @property (nonatomic, weak, nullable) id<WKScriptMessageHandler> scriptDelegate;
 
