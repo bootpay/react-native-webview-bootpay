@@ -18,7 +18,7 @@
 #import "objc/runtime.h"
 
 static NSTimer *keyboardTimer;
-static NSString *const HistoryShimName = @"ReactNativeHistoryShim";
+static NSString *const HistoryShimName = @"BPReactNativeHistoryShim";
 static NSString *const MessageHandlerName = @"BootpayRNWebView";
 static NSURLCredential* clientAuthenticationCredential;
 static NSDictionary* customCertificatesForHost;
