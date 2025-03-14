@@ -1,5 +1,5 @@
 {
-  "name": "react-native-webview",
+  "name": "react-native-webview-bootpay",
   "description": "React Native WebView component for iOS, Android, macOS, and Windows",
   "main": "index.js",
   "main-internal": "src/index.ts",
@@ -90,11 +90,11 @@
     "react-native.config.js"
   ],
   "codegenConfig": {
-    "name": "RNCWebViewSpec",
+    "name": "BPCWebViewSpec",
     "type": "all",
     "jsSrcsDir": "./src",
     "android": {
-      "javaPackageName": "com.reactnativecommunity.webview"
+      "javaPackageName": "kr.co.bootpay.webview"
     }
   },
   "packageManager": "yarn@1.22.19"

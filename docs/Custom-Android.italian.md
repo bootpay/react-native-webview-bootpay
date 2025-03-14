@@ -1,9 +1,9 @@
 Nonostante la web view integrata disponga di molte funzionalità, non è possibile gestire tutti i casi d'uso in React Native. Tuttavia, è possibile estendere la web view con codice nativo senza dover forkare React Native o duplicare l'intero codice esistente della web view.
 
-Prima di procedere, è consigliabile avere un'idea di base  dei concetti legati ai [native UI components](https://reactnative.dev/docs/native-components-android) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
+Prima di procedere, è consigliabile avere un'idea di base  dei concetti legati ai [native UI components](https://reactnative.dev/docs/native-components-android) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/BPCWebViewManager.java) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
 
 ## Codice nativo
-Per iniziare, dovrai creare una sottoclasse di `RNCWebViewManager`, `RNCWebView` e `RNCWebViewClient`. Poi, nel gestore della view, sovrascrivi i seguenti metodi:
+Per iniziare, dovrai creare una sottoclasse di `BPCWebViewManager`, `RNCWebView` e `BPCWebViewClient`. Poi, nel gestore della view, sovrascrivi i seguenti metodi:
 
 - `createViewInstance`
 - `getName`
@@ -11,11 +11,11 @@ Per iniziare, dovrai creare una sottoclasse di `RNCWebViewManager`, `RNCWebView`
 
 ```java
 @ReactModule(name = CustomWebViewManager.REACT_CLASS)
-public class CustomWebViewManager extends RNCWebViewManager {
+public class CustomWebViewManager extends BPCWebViewManager {
   /* Il nome usato qua deve essere identico a quello usato in JS. */
   protected static final String REACT_CLASS = "RCTCustomWebView";
 
-  protected static class CustomWebViewClient extends RNCWebViewClient { }
+  protected static class CustomWebViewClient extends BPCWebViewClient { }
 
   protected static class CustomWebView extends RNCWebView {
     public CustomWebView(ThemedReactContext reactContext) {
@@ -34,7 +34,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
   }
 
   @Override
-  protected void addEventEmitters(ThemedReactContext reactContext, RNCWebViewWrapper view) {
+  protected void addEventEmitters(ThemedReactContext reactContext, BPCWebViewWrapper view) {
     view.getWebView().setWebViewClient(new CustomWebViewClient());
   }
 }
@@ -46,7 +46,7 @@ Poi dovrai seguire i soliti passaggi per [register the module](https://reactnati
 Per aggiungere una nuova proprietà, è necessario includerla in `CustomWebView` e successivamente esporla tramite `CustomWebViewManager`.
 
 ```java
-public class CustomWebViewManager extends RNCWebViewManager {
+public class CustomWebViewManager extends BPCWebViewManager {
   ...
 
   protected static class CustomWebView extends RNCWebView {
@@ -68,7 +68,7 @@ public class CustomWebViewManager extends RNCWebViewManager {
   ...
 
   @ReactProp(name = "finalUrl")
-  public void setFinalUrl(RNCWebViewWrapper view, String url) {
+  public void setFinalUrl(BPCWebViewWrapper view, String url) {
     ((CustomWebView) view.getWebView()).setFinalUrl(url);
   }
 }
@@ -102,7 +102,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 
 Puoi far partire l'evento nel tuo client della web view. Puoi anche collegare handler già esistenti se i tuoi eventi si basano su di essi.
 
-Fai riferimento al file [RNCWebViewManager.java](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java) nel codice sorgente di `react-native-webview` per vedere quali handler sono disponibili e come sono implementati. Puoi estendere qualsiasi metodo qui per fornire funzionalità aggiuntive.
+Fai riferimento al file [BPCWebViewManager.java](https://github.com/react-native-webview/react-native-webview/blob/master/android/src/main/java/com/reactnativecommunity/webview/BPCWebViewManager.java) nel codice sorgente di `react-native-webview` per vedere quali handler sono disponibili e come sono implementati. Puoi estendere qualsiasi metodo qui per fornire funzionalità aggiuntive.
 
 ```java
 public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
@@ -126,7 +126,7 @@ public class NavigationCompletedEvent extends Event<NavigationCompletedEvent> {
 }
 
 // CustomWebViewManager.java
-protected static class CustomWebViewClient extends RNCWebViewClient {
+protected static class CustomWebViewClient extends BPCWebViewClient {
   @Override
   public boolean shouldOverrideUrlLoading(WebView view, String url) {
     boolean shouldOverride = super.shouldOverrideUrlLoading(view, url);
@@ -145,7 +145,7 @@ protected static class CustomWebViewClient extends RNCWebViewClient {
 Infine, esponi gli eventi in `CustomWebViewManager` attraverso `getExportedCustomDirectEventTypeConstants`. Nota che attualmente l'implementazione predefinita restituisce `null`, ma questo potrebbe cambiare in futuro.
 
 ```java
-public class CustomWebViewManager extends RNCWebViewManager {
+public class CustomWebViewManager extends BPCWebViewManager {
   ...
 
   @Override

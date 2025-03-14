@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Button, Switch, StyleSheet, Text, View} from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView from 'react-native-webview-bootpay';
 
 const HTML = `
 <!DOCTYPE html>\n

@@ -14,8 +14,8 @@ import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 
 import invariant from 'invariant';
 
-import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
-import RNCWebViewModule from './NativeRNCWebViewModule';
+import BPCWebView, { Commands, NativeProps } from './BPCWebViewNativeComponent';
+import BPCWebViewModule from './NativeBPCWebViewModule';
 import {
   defaultOriginWhitelist,
   defaultRenderError,
@@ -42,7 +42,7 @@ const registerCallableModule: (name: string, module: Object) => void =
   require('react-native').registerCallableModule ??
   BatchedBridge.registerCallableModule.bind(BatchedBridge);
 
-registerCallableModule('RNCWebViewMessagingModule', {
+registerCallableModule('BPCWebViewMessagingModule', {
   onShouldStartLoadWithRequest: (
     event: ShouldStartLoadRequestEvent & { messagingModuleName?: string }
   ) => {
@@ -110,7 +110,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
     const onShouldStartLoadWithRequestCallback = useCallback(
       (shouldStart: boolean, url: string, lockIdentifier?: number) => {
         if (lockIdentifier) {
-          RNCWebViewModule.shouldStartLoadWithLockIdentifier(
+          BPCWebViewModule.shouldStartLoadWithLockIdentifier(
             shouldStart,
             lockIdentifier
           );
@@ -233,7 +233,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
         );
       }
     } else if (viewState !== 'IDLE') {
-      console.error(`RNCWebView invalid state encountered: ${viewState}`);
+      console.error(`BPCWebView invalid state encountered: ${viewState}`);
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
@@ -250,7 +250,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
     }
 
     const NativeWebView =
-      (nativeConfig?.component as typeof RNCWebView | undefined) || RNCWebView;
+      (nativeConfig?.component as typeof BPCWebView | undefined) || BPCWebView;
 
     const sourceResolved = resolveAssetSource(source as ImageSourcePropType);
     const newSource =
@@ -327,7 +327,7 @@ const WebViewComponent = forwardRef<{}, AndroidWebViewProps>(
 );
 
 // native implementation should return "true" only for Android 5+
-const { isFileUploadSupported } = RNCWebViewModule;
+const { isFileUploadSupported } = BPCWebViewModule;
 
 const WebView = Object.assign(WebViewComponent, { isFileUploadSupported });
 

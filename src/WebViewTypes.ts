@@ -9,7 +9,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 
-import type NativeWebViewComponent from './RNCWebViewNativeComponent';
+import type NativeWebViewComponent from './BPCWebViewNativeComponent';
 
 type WebViewCommands =
   | 'goForward'
@@ -24,18 +24,18 @@ type WebViewCommands =
 
 type AndroidWebViewCommands = 'clearHistory' | 'clearFormData';
 
-interface RNCWebViewUIManager<Commands extends string> extends UIManagerStatic {
+interface BPCWebViewUIManager<Commands extends string> extends UIManagerStatic {
   getViewManagerConfig: (name: string) => {
     Commands: { [key in Commands]: number };
   };
 }
 
-export type RNCWebViewUIManagerAndroid = RNCWebViewUIManager<
+export type BPCWebViewUIManagerAndroid = BPCWebViewUIManager<
   WebViewCommands | AndroidWebViewCommands
 >;
-export type RNCWebViewUIManagerIOS = RNCWebViewUIManager<WebViewCommands>;
-export type RNCWebViewUIManagerMacOS = RNCWebViewUIManager<WebViewCommands>;
-export type RNCWebViewUIManagerWindows = RNCWebViewUIManager<WebViewCommands>;
+export type BPCWebViewUIManagerIOS = BPCWebViewUIManager<WebViewCommands>;
+export type BPCWebViewUIManagerMacOS = BPCWebViewUIManager<WebViewCommands>;
+export type BPCWebViewUIManagerWindows = BPCWebViewUIManager<WebViewCommands>;
 
 type WebViewState = 'IDLE' | 'LOADING' | 'ERROR';
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Alert, TextInput } from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView from 'react-native-webview-bootpay';
 
 const HTML = `<!DOCTYPE html>\n
 <html>

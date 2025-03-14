@@ -6,8 +6,8 @@ import React, {
 } from 'react';
 import { Image, View, ImageSourcePropType, HostComponent } from 'react-native';
 import invariant from 'invariant';
-import RNCWebView, { Commands, NativeProps } from './RNCWebViewNativeComponent';
-import RNCWebViewModule from './NativeRNCWebViewModule';
+import BPCWebView, { Commands, NativeProps } from './BPCWebViewNativeComponent';
+import BPCWebViewModule from './NativeBPCWebViewModule';
 import {
   defaultOriginWhitelist,
   defaultRenderError,
@@ -70,7 +70,7 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
 
     const onShouldStartLoadWithRequestCallback = useCallback(
       (shouldStart: boolean, _url: string, lockIdentifier = 0) => {
-        RNCWebViewModule.shouldStartLoadWithLockIdentifier(
+        BPCWebViewModule.shouldStartLoadWithLockIdentifier(
           !!shouldStart,
           lockIdentifier
         );
@@ -159,14 +159,14 @@ const WebViewComponent = forwardRef<{}, MacOSWebViewProps>(
         lastErrorEvent?.description ?? ''
       );
     } else if (viewState !== 'IDLE') {
-      console.error(`RNCWebView invalid state encountered: ${viewState}`);
+      console.error(`BPCWebView invalid state encountered: ${viewState}`);
     }
 
     const webViewStyles = [styles.container, styles.webView, style];
     const webViewContainerStyle = [styles.container, containerStyle];
 
     const NativeWebView =
-      (nativeConfig?.component as typeof RNCWebView | undefined) || RNCWebView;
+      (nativeConfig?.component as typeof BPCWebView | undefined) || BPCWebView;
 
     const sourceResolved = resolveAssetSource(source as ImageSourcePropType);
     const newSource =

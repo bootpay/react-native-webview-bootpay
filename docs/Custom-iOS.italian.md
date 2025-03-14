@@ -2,7 +2,7 @@
 
 Nonostante la web view integrata disponga di molte funzionalità, non è possibile gestire tutti i casi d'uso in React Native. Tuttavia, è possibile estendere la web view con codice nativo senza dover forkare React Native o duplicare l'intero codice esistente della web view.
 
-Prima di procedere, è consigliabile avere un'idea di base  dei concetti legati ai [native UI components](native-components-ios) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/apple/RNCWebViewManager.m) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
+Prima di procedere, è consigliabile avere un'idea di base  dei concetti legati ai [native UI components](native-components-ios) (componenti dell'interfaccia utente nativi). Inoltre, è opportuno familiarizzarsi con il [native code for web views](https://github.com/react-native-webview/react-native-webview/blob/master/apple/BPCWebViewManager.m) (codice nativo per le web view), poiché sarà necessario farvi riferimento durante l'implementazione delle nuove funzionalità, anche se non è richiesta una conoscenza approfondita.
 
 ## Codice nativo
 Come per i componenti nativi regolari, è necessario un gestore della view e una web view.

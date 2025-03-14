@@ -161,7 +161,7 @@ const WebViewComponent = forwardRef<{}, WindowsWebViewProps>(
         lastErrorEvent.description
       );
     } else if (viewState !== 'IDLE') {
-      console.error(`RNCWebView invalid state encountered: ${viewState}`);
+      console.error(`BPCWebView invalid state encountered: ${viewState}`);
     }
 
     const webViewStyles = [styles.container, styles.webView, style];

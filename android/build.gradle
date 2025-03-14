@@ -2,7 +2,7 @@ import java.nio.file.Paths
 
 buildscript {
     ext.safeExtGet = {prop ->
-        rootProject.ext.has(prop) ? rootProject.ext.get(prop) : project.properties['ReactNativeWebView_' + prop]
+        rootProject.ext.has(prop) ? rootProject.ext.get(prop) : project.properties['ReactNativeWebViewBootpay_' + prop]
     }
     repositories {
         google()
@@ -15,7 +15,7 @@ buildscript {
 }
 
 def getExtOrIntegerDefault(prop) {
-  return rootProject.ext.has(prop) ? rootProject.ext.get(prop) : (project.properties['ReactNativeWebView_' + prop]).toInteger()
+  return rootProject.ext.has(prop) ? rootProject.ext.get(prop) : (project.properties['ReactNativeWebViewBootpay_' + prop]).toInteger()
 }
 
 static def findNodeModulePath(baseDir, packageName) {
@@ -57,7 +57,7 @@ apply plugin: 'kotlin-android'
 
 android {
     if (supportsNamespace()) {
-        namespace "com.reactnativecommunity.webview"
+        namespace "kr.co.bootpay.webview"
         buildFeatures {
             buildConfig true
         }

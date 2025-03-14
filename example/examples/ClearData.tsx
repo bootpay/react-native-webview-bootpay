@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Button } from 'react-native';
 
-import WebView from 'react-native-webview';
+import WebView from 'react-native-webview-bootpay';
 
 type Props = {};
 type State = {};
