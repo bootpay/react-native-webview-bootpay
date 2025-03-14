@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { SafeAreaView, StyleSheet, Dimensions, Linking } from 'react-native';
 import { WebView } from 'react-native-webview-bootpay';
 
+
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
 export default function App() {
