@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import { SafeAreaView, StyleSheet, Dimensions, Linking } from 'react-native';
 import { WebView } from 'react-native-webview-bootpay';
 
-
 const { width: deviceWidth, height: deviceHeight } = Dimensions.get('window');
 
 export default function App() {
@@ -17,7 +16,7 @@ export default function App() {
   const shouldStartLoadWithRequest = useCallback((event) => {
     console.log('Request URL:', event.url);
 
-    if (event.url.includes("smartstore.naver")) {
+    if (event.url.includes('smartstore.naver')) {
       Linking.openURL(event.url);
       return false;
     }
