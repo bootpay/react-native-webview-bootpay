@@ -12,7 +12,7 @@
 
 using namespace facebook::react;
 
-auto BPStringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string value) {
+auto BPCSringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string value) {
     if (value == "click") return BPCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Click;
     if (value == "formsubmit") return BPCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formsubmit;
     if (value == "backforward") return BPCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Backforward;
@@ -21,7 +21,7 @@ auto BPStringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string value)
     return BPCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Other;
 }
 
-auto BPStringToOnLoadingStartNavigationTypeEnum(std::string value) {
+auto BPCStringToOnLoadingStartNavigationTypeEnum(std::string value) {
     if (value == "click") return BPCWebViewEventEmitter::OnLoadingStartNavigationType::Click;
     if (value == "formsubmit") return BPCWebViewEventEmitter::OnLoadingStartNavigationType::Formsubmit;
     if (value == "backforward") return BPCWebViewEventEmitter::OnLoadingStartNavigationType::Backforward;
@@ -30,7 +30,7 @@ auto BPStringToOnLoadingStartNavigationTypeEnum(std::string value) {
     return BPCWebViewEventEmitter::OnLoadingStartNavigationType::Other;
 }
 
-auto BPStringToOnLoadingFinishNavigationTypeEnum(std::string value) {
+auto BPCStringToOnLoadingFinishNavigationTypeEnum(std::string value) {
     if (value == "click") return BPCWebViewEventEmitter::OnLoadingFinishNavigationType::Click;
     if (value == "formsubmit") return BPCWebViewEventEmitter::OnLoadingFinishNavigationType::Formsubmit;
     if (value == "backforward") return BPCWebViewEventEmitter::OnLoadingFinishNavigationType::Backforward;
@@ -81,7 +81,7 @@ auto BPStringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .navigationType = BPStringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                    .navigationType = BPCStringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
                     .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
                     .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoForward"] boolValue]),
                     .isTopFrame = static_cast<bool>([[dictionary valueForKey:@"isTopFrame"] boolValue]),
@@ -98,7 +98,7 @@ auto BPStringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .navigationType = BPStringToOnLoadingStartNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
+                    .navigationType = BPCStringToOnLoadingStartNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String])),
                     .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
                     .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoForward"] boolValue]),
                     .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
@@ -146,7 +146,7 @@ auto BPStringToOnLoadingFinishNavigationTypeEnum(std::string value) {
                     .url = std::string([[dictionary valueForKey:@"url"] UTF8String]),
                     .lockIdentifier = [[dictionary valueForKey:@"lockIdentifier"] doubleValue],
                     .title = std::string([[dictionary valueForKey:@"title"] UTF8String]),
-                    .navigationType = BPStringToOnLoadingFinishNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String], [[dictionary valueForKey:@"navigationType"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])),
+                    .navigationType = BPCStringToOnLoadingFinishNavigationTypeEnum(std::string([[dictionary valueForKey:@"navigationType"] UTF8String], [[dictionary valueForKey:@"navigationType"] lengthOfBytesUsingEncoding:NSUTF8StringEncoding])),
                     .canGoBack = static_cast<bool>([[dictionary valueForKey:@"canGoBack"] boolValue]),
                     .canGoForward = static_cast<bool>([[dictionary valueForKey:@"canGoForward"] boolValue]),
                     .loading = static_cast<bool>([[dictionary valueForKey:@"loading"] boolValue]),
