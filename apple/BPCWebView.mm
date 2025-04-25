@@ -12,7 +12,7 @@
 
 using namespace facebook::react;
 
-auto BPCSringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string value) {
+auto BPCStringToOnShouldStartLoadWithRequestNavigationTypeEnum(std::string value) {
     if (value == "click") return BPCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Click;
     if (value == "formsubmit") return BPCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Formsubmit;
     if (value == "backforward") return BPCWebViewEventEmitter::OnShouldStartLoadWithRequestNavigationType::Backforward;
