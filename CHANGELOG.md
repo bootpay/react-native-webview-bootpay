@@ -1,3 +1,8 @@
+### 13.13.47
+- BPCWebChromeClient onProgressChanged NullPointerException 수정
+- progressChangedFilter, mWebView, ThemedReactContext null 체크 추가
+- EventDispatcher 호출 시 try-catch 예외 처리 추가
+
 ### 13.13.45
 - WebView version update
 

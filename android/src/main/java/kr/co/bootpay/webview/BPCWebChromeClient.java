@@ -273,21 +273,11 @@ public class BPCWebChromeClient extends WebChromeClient implements LifecycleEven
     public void onProgressChanged(WebView webView, int newProgress) {
         super.onProgressChanged(webView, newProgress);
         final String url = webView.getUrl();
-        if (progressChangedFilter.isWaitingForCommandLoadUrl()) {
+        if (progressChangedFilter != null && progressChangedFilter.isWaitingForCommandLoadUrl()) {
             return;
         }
 
-        if(isPopupWebView) {
-            return;
-        }
-
-      Log.e("BPCWebChromeClient", "" + isPopupWebView);
-//        if(this.mWebView == null || this.mWebView.getThemedReactContext() == null) return;
-//      UIManagerModule uiManager = (this.mWebView.getThemedReactContext()).getNativeModule(UIManagerModule.class);
-//      if (uiManager == null) {
-//        Log.e("BPCWebChromeClient", "UIManagerModule is null, skipping event dispatch.");
-//        return;
-//      }
+        if(this.mWebView == null || this.mWebView.getThemedReactContext() == null) return;
 
         int reactTag = BPCWebViewWrapper.getReactTagFromWebView(webView);
         WritableMap event = Arguments.createMap();
@@ -298,8 +288,11 @@ public class BPCWebChromeClient extends WebChromeClient implements LifecycleEven
         event.putBoolean("canGoForward", webView.canGoForward());
         event.putDouble("progress", (float) newProgress / 100);
 
-      UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
-
+        try {
+            UIManagerHelper.getEventDispatcherForReactTag(this.mWebView.getThemedReactContext(), reactTag).dispatchEvent(new TopLoadingProgressEvent(reactTag, event));
+        } catch (Exception e) {
+            Log.e("BPCWebChromeClient", "Error dispatching progress event: " + e.getMessage());
+        }
     }
 
     @Override
