@@ -302,9 +302,17 @@ public class BPCWebView extends WebView implements LifecycleEventListener {
 
     private void injectJavascriptObject() {
       if (getSettings().getJavaScriptEnabled()) {
+        // iOS와 동일하게 postMessage 함수를 명시적으로 정의
+        // WebViewCompat.addWebMessageListener가 주입한 원본 postMessage를 보존하면서
+        // injectedObjectJson 등 추가 기능 제공
         String js = "(function(){\n" +
+          "    var existing = window." + JAVASCRIPT_INTERFACE + ";\n" +
+          "    var originalPostMessage = existing ? existing.postMessage : null;\n" +
           "    window." + JAVASCRIPT_INTERFACE + " = window." + JAVASCRIPT_INTERFACE + " || {};\n" +
           "    window." + JAVASCRIPT_INTERFACE + ".injectedObjectJson = function () { return " + (injectedJavaScriptObject == null ? null : ("`" + injectedJavaScriptObject + "`")) + "; };\n" +
+          "    if (originalPostMessage) {\n" +
+          "        window." + JAVASCRIPT_INTERFACE + ".postMessage = originalPostMessage;\n" +
+          "    }\n" +
           "})();";
         evaluateJavascriptWithFallback(js);
       }
@@ -471,9 +479,15 @@ public class BPCWebView extends WebView implements LifecycleEventListener {
          * - window[JAVASCRIPT_INTERFACE].postMessage
          */
         @JavascriptInterface
-        public void postMessage(String message) {
+        public void postMessage(final String message) {
             if (mWebView.getMessagingEnabled()) {
-                mWebView.onMessage(message, mWebView.getUrl());
+                // WebView methods must be called on the main (UI) thread
+                mWebView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mWebView.onMessage(message, mWebView.getUrl());
+                    }
+                });
             } else {
                 FLog.w(TAG, "ReactNativeWebView.postMessage method was called but messaging is disabled. Pass an onMessage handler to the WebView.");
             }
