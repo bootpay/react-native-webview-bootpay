@@ -1,3 +1,7 @@
+### 13.13.48
+- Android postMessage를 메인 UI 스레드에서 호출하도록 수정
+- JavaScript 객체 주입 시 기존 postMessage 함수 보존
+
 ### 13.13.47
 - BPCWebChromeClient onProgressChanged NullPointerException 수정
 - progressChangedFilter, mWebView, ThemedReactContext null 체크 추가
