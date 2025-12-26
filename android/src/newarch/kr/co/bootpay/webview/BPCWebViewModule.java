@@ -29,6 +29,16 @@ public class BPCWebViewModule extends NativeBPCWebViewModuleSpec {
         mBPCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }
 
+    @Override
+    public void warmUp() {
+        mBPCWebViewModuleImpl.warmUp();
+    }
+
+    @Override
+    public void releaseWarmUp() {
+        mBPCWebViewModuleImpl.releaseWarmUp();
+    }
+
     public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {
         mBPCWebViewModuleImpl.startPhotoPickerIntent(acceptType, filePathCallback);
     }

@@ -12,4 +12,11 @@
 + (instancetype) sharedManager;
 - (WKProcessPool *)sharedProcessPool;
 
+/// WebView 프로세스를 미리 초기화하여 첫 결제 화면 로딩 속도를 개선합니다.
+/// AppDelegate의 didFinishLaunchingWithOptions 또는 적절한 시점에 호출하세요.
+- (void)warmUp;
+
+/// 프리워밍된 WebView 리소스를 해제합니다.
+- (void)releaseWarmUp;
+
 @end

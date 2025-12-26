@@ -31,6 +31,16 @@ public class BPCWebViewModule extends ReactContextBaseJavaModule {
         mBPCWebViewModuleImpl.shouldStartLoadWithLockIdentifier(shouldStart, lockIdentifier);
     }
 
+    @ReactMethod
+    public void warmUp() {
+        mBPCWebViewModuleImpl.warmUp();
+    }
+
+    @ReactMethod
+    public void releaseWarmUp() {
+        mBPCWebViewModuleImpl.releaseWarmUp();
+    }
+
     public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {
         mBPCWebViewModuleImpl.startPhotoPickerIntent(acceptType, filePathCallback);
     }

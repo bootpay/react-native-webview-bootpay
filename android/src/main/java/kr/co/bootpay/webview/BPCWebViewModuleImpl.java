@@ -34,6 +34,11 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
 
+import android.webkit.CookieManager;
+import android.webkit.WebView;
+import android.os.Handler;
+import android.os.Looper;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.SecurityException;
@@ -51,6 +56,10 @@ public class BPCWebViewModuleImpl implements ActivityEventListener {
     public static final int PICKER_LEGACY = 3;
     public static final int FILE_DOWNLOAD_PERMISSION_REQUEST = 1;
 
+    // WarmUp을 위한 프리워밍된 WebView
+    private static WebView sPrewarmedWebView;
+    private static boolean sIsWarmedUp = false;
+
     final private ReactApplicationContext mContext;
 
     private DownloadManager.Request mDownloadRequest;
@@ -63,6 +72,51 @@ public class BPCWebViewModuleImpl implements ActivityEventListener {
     public BPCWebViewModuleImpl(ReactApplicationContext context) {
         mContext = context;
         context.addActivityEventListener(this);
+    }
+
+    /**
+     * WebView 프로세스를 미리 초기화하여 첫 결제 화면 로딩 속도를 개선합니다.
+     * Application의 onCreate 또는 적절한 시점에 호출하세요.
+     *
+     * Chromium 엔진 초기화에 200-300ms가 소요되므로, 이 메서드를 미리 호출하면
+     * 실제 결제 시 즉시 WebView가 표시됩니다.
+     */
+    public void warmUp() {
+        if (sIsWarmedUp) {
+            return;
+        }
+
+        new Handler(Looper.getMainLooper()).post(() -> {
+            try {
+                // CookieManager 초기화로 Chromium 엔진 로드 (thread-safe)
+                CookieManager.getInstance();
+
+                // 프리워밍용 WebView 생성
+                if (sPrewarmedWebView == null && mContext != null) {
+                    sPrewarmedWebView = new WebView(mContext);
+                    // 빈 HTML을 로드하여 WebContent 프로세스 초기화
+                    sPrewarmedWebView.loadDataWithBaseURL(null, "", "text/html", "UTF-8", null);
+                }
+
+                sIsWarmedUp = true;
+            } catch (Exception e) {
+                Log.w("BPCWebViewModule", "Failed to warm up WebView", e);
+            }
+        });
+    }
+
+    /**
+     * 프리워밍된 WebView 리소스를 해제합니다.
+     * 메모리가 부족할 때 호출할 수 있습니다.
+     */
+    public void releaseWarmUp() {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (sPrewarmedWebView != null) {
+                sPrewarmedWebView.destroy();
+                sPrewarmedWebView = null;
+            }
+            sIsWarmedUp = false;
+        });
     }
 
     @Override

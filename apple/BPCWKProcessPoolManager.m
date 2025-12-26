@@ -10,6 +10,7 @@
 
 @interface BPCWKProcessPoolManager() {
   WKProcessPool *_sharedProcessPool;
+  WKWebView *_prewarmedWebView;
 }
 @end
 
@@ -30,6 +31,25 @@
     _sharedProcessPool = [[WKProcessPool alloc] init];
   }
   return _sharedProcessPool;
+}
+
+- (void)warmUp {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self->_prewarmedWebView == nil) {
+      WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
+      config.processPool = [self sharedProcessPool];
+
+      self->_prewarmedWebView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:config];
+      // 빈 HTML을 로드하여 WebContent 프로세스 초기화
+      [self->_prewarmedWebView loadHTMLString:@"" baseURL:nil];
+    }
+  });
+}
+
+- (void)releaseWarmUp {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    self->_prewarmedWebView = nil;
+  });
 }
 
 @end

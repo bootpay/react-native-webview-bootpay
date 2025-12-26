@@ -1,6 +1,7 @@
 #import "BPCWebViewModule.h"
 
 #import "BPCWebViewDecisionManager.h"
+#import "BPCWKProcessPoolManager.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <React/RCTFabricComponentsPlugins.h>
@@ -9,6 +10,14 @@
 @implementation BPCWebViewModule
 
 RCT_EXPORT_MODULE(BPCWebViewModule)
+
+RCT_EXPORT_METHOD(warmUp) {
+    [[BPCWKProcessPoolManager sharedManager] warmUp];
+}
+
+RCT_EXPORT_METHOD(releaseWarmUp) {
+    [[BPCWKProcessPoolManager sharedManager] releaseWarmUp];
+}
 
 RCT_EXPORT_METHOD(isFileUploadSupported:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     if (resolve) {
