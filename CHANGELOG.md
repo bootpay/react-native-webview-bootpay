@@ -1,3 +1,9 @@
+### 13.13.49
+- iOS warmUp 기능 개선
+  - warmUpWithDelay 메서드 추가 (지연 시간 설정 가능)
+  - GPU, WebContent, Networking 프로세스 완전 초기화
+  - 최소 HTML 로드로 Canvas 렌더링 및 네트워크 요청 수행
+
 ### 13.13.48
 - Android postMessage를 메인 UI 스레드에서 호출하도록 수정
 - JavaScript 객체 주입 시 기존 postMessage 함수 보존

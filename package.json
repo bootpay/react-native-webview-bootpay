@@ -11,7 +11,7 @@
   ],
   "license": "MIT",
   "version": "13.13.49",
-  "homepage": "https://github.com/react-native-webview/react-native-webview#readme",
+  "homepage": "https://github.com/bootpay/react-native-webview-bootpay#readme",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -72,7 +72,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/react-native-webview/react-native-webview.git"
+    "url": "https://github.com/bootpay/react-native-webview-bootpay.git"
   },
   "files": [
     "android/src",
