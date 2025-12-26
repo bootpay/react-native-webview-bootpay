@@ -80,3 +80,40 @@ This readme is available in:
 - [Brazilian portuguese](docs/README.portuguese.md)
 - [French](docs/README.french.md)
 - [Italian](docs/README.italian.md)
+
+---
+
+## Bootpay WebView 프리워밍 (iOS)
+
+iOS의 WKWebView는 첫 로딩 시 GPU, Networking, WebContent 프로세스 초기화로 4-6초 지연이 발생할 수 있습니다.
+
+**Bootpay React Native WebView는 모듈 로드 시 자동으로 프리워밍이 시작됩니다.** 별도의 설정 없이도 첫 결제 화면 로딩 속도가 개선됩니다.
+
+### 수동 호출 (선택사항)
+
+특별한 타이밍에 프리워밍을 시작하고 싶다면 수동으로 호출할 수 있습니다:
+
+```javascript
+import { NativeModules } from 'react-native';
+
+const { BPCWebViewModule } = NativeModules;
+
+// 기본 호출 (0.1초 딜레이)
+BPCWebViewModule.warmUp();
+
+// 커스텀 딜레이로 호출 (UI 버벅임 시)
+BPCWebViewModule.warmUpWithDelay(0.5);
+
+// 메모리 부족 시 리소스 해제
+BPCWebViewModule.releaseWarmUp();
+```
+
+### API
+
+| 메서드 | 설명 |
+|--------|------|
+| `warmUp()` | WebView 프로세스 미리 초기화 (자동 실행됨) |
+| `warmUpWithDelay(delay)` | 커스텀 딜레이(초)로 프리워밍 |
+| `releaseWarmUp()` | 프리워밍 리소스 해제 |
+
+> **참고**: Android에서는 이 기능이 no-op으로 동작합니다 (iOS 전용).

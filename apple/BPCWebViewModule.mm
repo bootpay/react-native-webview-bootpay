@@ -11,8 +11,19 @@
 
 RCT_EXPORT_MODULE(BPCWebViewModule)
 
+// 모듈 로드 시 자동으로 WebView 프리워밍 시작
++ (void)load {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[BPCWKProcessPoolManager sharedManager] warmUp];
+    });
+}
+
 RCT_EXPORT_METHOD(warmUp) {
     [[BPCWKProcessPoolManager sharedManager] warmUp];
+}
+
+RCT_EXPORT_METHOD(warmUpWithDelay:(double)delay) {
+    [[BPCWKProcessPoolManager sharedManager] warmUpWithDelay:delay];
 }
 
 RCT_EXPORT_METHOD(releaseWarmUp) {
