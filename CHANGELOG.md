@@ -1,3 +1,8 @@
+### 13.14.0
+- iOS 빌드 에러 수정: RCT_EXPORT_MODULE과 +load 메서드 중복 선언 충돌 해결
+  - +load 대신 __attribute__((constructor))로 변경하여 프리워밍 타이밍 유지
+  - React Native 0.76+ (Expo 54) 환경에서 발생하는 duplicate declaration of method 'load' 에러 해결
+
 ### 13.13.49
 - iOS warmUp 기능 개선
   - warmUpWithDelay 메서드 추가 (지연 시간 설정 가능)

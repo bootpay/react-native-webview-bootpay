@@ -12,7 +12,9 @@
 RCT_EXPORT_MODULE(BPCWebViewModule)
 
 // 모듈 로드 시 자동으로 WebView 프리워밍 시작
-+ (void)load {
+// +load 대신 constructor attribute 사용 (RCT_EXPORT_MODULE이 이미 +load를 정의하므로 충돌 방지)
+__attribute__((constructor))
+static void BPCWebViewModuleAutoWarmUp(void) {
     dispatch_async(dispatch_get_main_queue(), ^{
         [[BPCWKProcessPoolManager sharedManager] warmUp];
     });
