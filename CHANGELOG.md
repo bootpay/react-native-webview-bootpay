@@ -1,3 +1,8 @@
+### 13.14.1
+- React Native New Architecture (Fabric) 웹뷰 흰 화면 수정
+  - codegenConfig에 ios.componentProvider 명시적 추가
+  - RN codegen이 패키지 경로의 'react-native' 문자열을 필터링하여 BPCWebView Fabric 컴포넌트 등록이 누락되는 버그 우회
+
 ### 13.14.0
 - iOS 빌드 에러 수정: RCT_EXPORT_MODULE과 +load 메서드 중복 선언 충돌 해결
   - +load 대신 __attribute__((constructor))로 변경하여 프리워밍 타이밍 유지
