@@ -10,7 +10,7 @@
     "Thibault Malbranche <malbranche.thibault@gmail.com>"
   ],
   "license": "MIT",
-  "version": "13.14.0",
+  "version": "13.14.1",
   "homepage": "https://github.com/bootpay/react-native-webview-bootpay#readme",
   "scripts": {
     "android": "react-native run-android",
@@ -95,6 +95,11 @@
     "jsSrcsDir": "./src",
     "android": {
       "javaPackageName": "kr.co.bootpay.webview"
+    },
+    "ios": {
+      "componentProvider": {
+        "BPCWebView": "BPCWebView"
+      }
     }
   },
   "packageManager": "yarn@1.22.19"
