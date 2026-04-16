@@ -1,3 +1,11 @@
+### 13.14.2
+- Android `<queries>` 패키지 목록 보강 (Android 11+ package visibility)
+  - 삼성 모니모(`net.ib.android.smcard`), 카카오뱅크(`com.kakaobank.channel`) 누락으로 인해
+    나이스페이 삼성카드→모니모 선택 무반응 / 카카오뱅크 열기 시 다운로드 링크로만 이동하는 이슈 수정
+  - 추가 패키지: 신한 SOL 뱅크(`com.shinhan.sbanking`), 안심클릭 백신(`net.nshc.droidxantivirus`),
+    KCB(SKT, `com.om.sktelecom.tauth`), 티머니(`com.tmoney.inapp`, `com.tmoney.nfc_pay`),
+    캐시비(`com.ebcard.cashbeeinapp`), 원스토어(`com.skt.skaf.A000Z00040`)
+
 ### 13.14.1
 - React Native New Architecture (Fabric) 웹뷰 흰 화면 수정
   - codegenConfig에 ios.componentProvider 명시적 추가
