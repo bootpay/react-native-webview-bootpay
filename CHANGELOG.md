@@ -1,3 +1,9 @@
+### 13.14.4
+- iOS `startItunesToInstall` 라우팅 보강 — 삼성 모니모(`monimopay://`, `smcard://`) 스킴 매핑 추가
+  - 기존에는 매핑 분기 부재로 모니모 앱 미설치 시 버튼이 무반응
+  - 이제 다른 카드사와 동일하게 App Store(`id379577046`)로 fallback
+  - 13.14.3의 Android 라우팅 보강과 iOS 동기화
+
 ### 13.14.3
 - Android `BootpayUrlHelper` URL 라우팅 개선 (나이스페이 앱카드 관련)
   - `isSpecialCase()`에 `kakaobank://`, `monimopay://`, `smcard://` 스킴 추가
