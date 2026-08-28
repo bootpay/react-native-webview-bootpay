@@ -424,7 +424,20 @@ RCTAutoInsetsProtocol>
 }
 
 - (void)webViewDidClose:(WKWebView *)webView {
-    [webView removeFromSuperview];
+    // window.close() 로 닫히는 것은 createWebViewWithConfiguration 이 만든 팝업뿐이다.
+    // RN 이 관리하는 본체 webview 를 superview 에서 떼어내면 화면이 빈 채로 남고
+    // 다시 붙일 방법이 없으므로 팝업일 때만 제거한다.
+    if (webView != _webView) {
+        [webView removeFromSuperview];
+    }
+    // WKWebView 는 window.close() 를 네이티브에만 알리고 JS 로는 아무 이벤트도 주지 않는다.
+    // 그대로 두면 결제 페이지의 닫기(X) 버튼이 RN 쪽에 전달되지 않아 Modal 이 남는다.
+    if (_onMessage) {
+        NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        [event addEntriesFromDictionary: @{@"data": @"{\"event\":\"close\"}"}];
+        [event addEntriesFromDictionary: @{@"url": webView.URL.absoluteString ?: @""}];
+        _onMessage(event);
+    }
 }
 
 /**
