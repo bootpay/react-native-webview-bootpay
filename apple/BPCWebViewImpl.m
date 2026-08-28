@@ -429,7 +429,9 @@ RCTAutoInsetsProtocol>
     // 다시 붙일 방법이 없으므로 팝업일 때만 제거한다.
     if (webView != _webView) {
         [webView removeFromSuperview];
+        return;
     }
+    // 여기부터는 본체가 닫히는 경우다.
     // WKWebView 는 window.close() 를 네이티브에만 알리고 JS 로는 아무 이벤트도 주지 않는다.
     // 그대로 두면 결제 페이지의 닫기(X) 버튼이 RN 쪽에 전달되지 않아 Modal 이 남는다.
     if (_onMessage) {
