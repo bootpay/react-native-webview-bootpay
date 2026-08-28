@@ -1,3 +1,11 @@
+### 13.14.5
+- iOS `webViewDidClose:` 가 본체 webview 를 뜯어내고 JS 로는 아무것도 알리지 않던 문제 수정
+  - 페이지가 `window.close()` 를 부르면 RN 이 관리하는 webview 가 뷰 계층에서 빠지는데
+    다시 붙일 방법이 없어 결제창이 빈 화면으로 남았다
+  - 팝업(`createWebViewWithConfiguration` 이 만든 것)일 때만 제거하고,
+    본체가 닫히는 경우에만 `onMessage` 로 `{"event":"close"}` 를 올려보낸다
+  - 새 prop 없이 기존 메시지 채널을 재사용해 old/new arch 양쪽에서 동작
+
 ### 13.14.4
 - iOS `startItunesToInstall` 라우팅 보강 — 삼성 모니모(`monimopay://`, `smcard://`) 스킴 매핑 추가
   - 기존에는 매핑 분기 부재로 모니모 앱 미설치 시 버튼이 무반응
